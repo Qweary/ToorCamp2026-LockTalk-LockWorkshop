@@ -77,14 +77,14 @@
 </section>
 
 <!-- ===================================================================
-     S2 — Meta reveal beat (ANE-001)
+     S2 — Meta reveal beat
      HOOK · 0:45–4:00
      The reversal: operator is the one who spread the lock.
      Company response is the pivot. Visual: three-beat structure.
      =================================================================== -->
 <section id="s2-reveal" data-slide="S2">
   <div class="slide tight">
-    <div class="anchor">HOOK &middot; ANE-001</div>
+    <div class="anchor">HOOK</div>
     <div class="s2-reveal">
       <div class="pivot">"I put them there."</div>
       <div class="consequence">
@@ -112,9 +112,9 @@
     <div class="s3-bio">
       <div class="handle">qweary</div>
       <div class="roles">locksmith &middot; red team hobbyist</div>
-      <div class="first-talk">first conference talk.</div>
+      <div class="first-talk">senior physical security engineer &middot; I fix locks during the day and red team at night</div>
       <div class="repo-ref">
-        github.com/qweary/dead-bytes<br>
+        code &amp; notes: github.com/qweary &nbsp;&middot;&nbsp; writeups: qweary.github.io<br>
         33pp handwritten notes &middot; 5-part blog (Jul&ndash;Aug 2025) &middot; all the code
       </div>
     </div>
@@ -138,14 +138,14 @@
 </section>
 
 <!-- ===================================================================
-     S5 — "We're not worried about it." (ANE-003)
+     S5 — "We're not worried about it."
      RELATIONSHIP · 8:00–12:00
      Quote box is the emotional anchor. Pause after it.
      "third-party relays" — no role description per locked flag.
      =================================================================== -->
 <section id="s5-quote" data-slide="S5">
   <div class="slide tight">
-    <div class="anchor">THE RELATIONSHIP THAT BROKE &middot; ANE-003</div>
+    <div class="anchor">THE RELATIONSHIP THAT BROKE</div>
     <div class="s5-rel">
       <div class="timeline">
         <span class="tl-entry">Early installs &rarr; physical disclosures &rarr; company responds. That's the good version.</span>
@@ -162,6 +162,12 @@
         The company wouldn't talk to me.<br>
         And I had a year of locksmith context and a really bad idea.
       </div>
+      <figure class="exhibit ex-amber s5-exhibit">
+        <img src="img/10-wireless-lock.jpg" alt="DL-Windows wireless-lock spec: password fixed at exactly 6 characters"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">wireless lock spec</span>they also sell a wireless lock. its security password is "exactly 6 characters in length." a fixed, weak password floor — by design.</div>
+        <figcaption><span class="ex-tag">posture</span>they also sell a wireless lock. the password is "exactly 6 characters in length." not a minimum. a fixed floor.</figcaption>
+      </figure>
     </div>
     <div class="brand">dead-bytes.deck</div>
   </div>
@@ -176,7 +182,26 @@
   <div class="slide tight">
     <div class="anchor">WHAT THIS LOCK IS</div>
     <div class="s6-anatomy">
-      <div class="photo-placeholder">[ T2/T3 photo ]</div>
+      <div class="s6-photos">
+        <figure class="exhibit">
+          <img src="img/06-lock-board.jpg" alt="Full lock board: MSP430 MCU, buzzers, JTAG header, U-shaped bridge pin in tweezers"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">lock board</span>MSP430 MCU · buzzers · exposed JTAG header · tweezers holding a U-shaped bridge pin.</div>
+          <figcaption><span class="ex-tag">the board</span>MSP430 · buzzers · the JTAG header nobody blew the fuse on.</figcaption>
+        </figure>
+        <figure class="exhibit">
+          <img src="img/08-nand-macro.jpg" alt="Macro of the Adesto AT45DB041E NAND flash chip"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">NAND macro</span>Adesto AT45DB041E. every user code lives here, in plaintext.</div>
+          <figcaption><span class="ex-tag">the NAND</span>AT45DB041E · plaintext codes.</figcaption>
+        </figure>
+        <figure class="exhibit">
+          <img src="img/09-mcu-macro.jpg" alt="Macro of the MSP430F2418 microcontroller"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">MCU macro</span>MSP430F2418. its assembly representation bleeds into the storage format.</div>
+          <figcaption><span class="ex-tag">the MCU</span>MSP430F2418.</figcaption>
+        </figure>
+      </div>
       <div>
         <div class="components">
           <span class="lbl">MCU:</span> MSP430F2418<br>
@@ -250,14 +275,14 @@
 </section>
 
 <!-- ===================================================================
-     S9 — Four Attacks, No Trace (ANE-002 service member story)
+     S9 — Four Attacks, No Trace (service member story)
      LAYER 1 · 15:30–21:00
      Attack list first. Then the story box. Pause after the wire story.
      "a different locksmith" — unnamed, unidentifiable per locked flag.
      =================================================================== -->
 <section id="s9-l1-content" data-slide="S9">
   <div class="slide tight">
-    <div class="anchor">LAYER 1 &middot; ANE-002</div>
+    <div class="anchor">LAYER 1</div>
     <div class="s9-l1">
       <div class="attack-list">
         <span><span class="atk-num">1.</span> acoustic keylogging <span class="atk-desc">&mdash; speaker voltage, scope, no contact</span></span><br>
@@ -266,7 +291,7 @@
         <span><span class="atk-num">4.</span> remote release bridging <span class="atk-desc">&mdash; [ story ]</span></span>
       </div>
       <div class="story-box">
-        <span class="story-label">// ANE-002 · service member story</span>
+        <span class="story-label">// service member story</span>
         <span class="story-line">service member: "I punch the door and it opens."</span>
         <span class="story-line">a different locksmith cut the remote release wires short. capped inside the metal frame.</span>
         <span class="story-line">jostling on impact &rarr; intermittent contact &rarr; lock reads it as a remote release signal.</span>
@@ -284,12 +309,20 @@
      LAYER 2 · 21:00–21:30
      =================================================================== -->
 <section id="s10-l2-divider" data-slide="S10">
-  <div class="slide divider ch-layer">
+  <div class="slide divider ch-layer has-hero">
     <div class="anchor">LAYER 2</div>
-    <div class="chapter-num">LAYER 2</div>
-    <div class="chapter">NAND FLASH<span class="cur blink"></span></div>
-    <div class="rule">&mdash;&mdash;&mdash; Adesto AT45DB041E &mdash;&mdash;&mdash;</div>
-    <div class="sub">264-byte pages &middot; 50 users &middot; plaintext codes</div>
+    <div class="divider-text">
+      <div class="chapter-num">LAYER 2</div>
+      <div class="chapter">NAND FLASH<span class="cur blink"></span></div>
+      <div class="rule">&mdash;&mdash;&mdash; Adesto AT45DB041E &mdash;&mdash;&mdash;</div>
+      <div class="sub">264-byte pages &middot; 50 users &middot; plaintext codes</div>
+    </div>
+    <figure class="exhibit divider-hero">
+      <img src="img/08-nand-macro.jpg" alt="Macro of the Adesto AT45DB041E NAND flash chip"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="exhibit-fallback"><span class="efb-tag">NAND macro</span>Adesto AT45DB041E — the chip that stores every code in plaintext.</div>
+      <figcaption><span class="ex-tag">the chip</span>this is where the codes live.</figcaption>
+    </figure>
     <div class="brand">dead-bytes.deck</div>
   </div>
 </section>
@@ -330,6 +363,26 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
         </div>
       </div>
       <div class="nand-closing">forensic evasion window. Print &ne; Export.</div>
+      <div class="s11-photos">
+        <figure class="exhibit">
+          <img src="img/01-dump-rig-t48.jpg" alt="Dump rig: lock PCB, T48 ZIF programmer, SOP8 clip"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">$30 dump rig</span>lock PCB · T48 ZIF programmer · SOP8 clip. the whole read costs $30.</div>
+          <figcaption><span class="ex-tag">$30 dump rig</span>T48 + SOP8 clip. that's the whole read.</figcaption>
+        </figure>
+        <figure class="exhibit ex-amber">
+          <img src="img/12-dlwindows-9digit.jpg" alt="DL-Windows audit showing a 9-digit lock code where the field max is 6"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">9-digit code · max is 6</span>injected. the 6-character limit is only enforced in software, never on the chip.</div>
+          <figcaption><span class="ex-tag">9-digit code · max is 6</span>injected. the limit is software-only.</figcaption>
+        </figure>
+        <figure class="exhibit ex-red">
+          <img src="img/11-dlwindows-crash.jpg" alt="DL-Windows crashing while auditing an injected non-standard code"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">audit software · crash</span>feed it a code it never expects (ABCDEFG vs 123456) and the auditor chokes.</div>
+          <figcaption><span class="ex-tag">audit software · crash</span>feed it a code it never expects. it chokes.</figcaption>
+        </figure>
+      </div>
     </div>
     <div class="brand">dead-bytes.deck</div>
   </div>
@@ -341,18 +394,26 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
      The self-deprecating beat is load-bearing here.
      =================================================================== -->
 <section id="s12-l3-divider" data-slide="S12">
-  <div class="slide divider ch-layer">
+  <div class="slide divider ch-layer has-hero">
     <div class="anchor">LAYER 3</div>
-    <div class="chapter-num">LAYER 3</div>
-    <div class="chapter">FIRMWARE<span class="cur blink"></span></div>
-    <div class="rule">&mdash;&mdash;&mdash; JTAG fuse: never blown &mdash;&mdash;&mdash;</div>
-    <div class="sub">$30 programmer &middot; soldering iron &middot; unreasonable stubbornness</div>
+    <div class="divider-text">
+      <div class="chapter-num">LAYER 3</div>
+      <div class="chapter">FIRMWARE<span class="cur blink"></span></div>
+      <div class="rule">&mdash;&mdash;&mdash; JTAG fuse: never blown &mdash;&mdash;&mdash;</div>
+      <div class="sub">$30 programmer &middot; soldering iron &middot; unreasonable stubbornness</div>
+    </div>
+    <figure class="exhibit ex-red divider-hero">
+      <img src="img/04-soldering-failure.jpg" alt="A soldering failure: bridged and burned test pins, a wire and test port pulled out of the board"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+      <div class="exhibit-fallback"><span class="efb-tag">when failure is not so pretty</span>bridged and burned test pins · a wire and a test port pulled clean out of the board.</div>
+      <figcaption><span class="ex-tag">unreasonable stubbornness</span>when failure is not so pretty. this is the wrong turns.</figcaption>
+    </figure>
     <div class="brand">dead-bytes.deck</div>
   </div>
 </section>
 
 <!-- ===================================================================
-     S13 — 38-Byte Payload [DEMO] (ANE-005)
+     S13 — 38-Byte Payload [DEMO]
      LAYER 3 · 28:30–36:00
      Payload assembly block is the hacker-audience payoff.
      Video cue must be explicitly visible on screen.
@@ -360,8 +421,8 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
      =================================================================== -->
 <section id="s13-payload" data-slide="S13">
   <div class="slide tight">
-    <div class="anchor">LAYER 3 &middot; ANE-005 &middot; [DEMO]</div>
-    <div class="s13-fw">
+    <div class="anchor">LAYER 3 &middot; [DEMO]</div>
+    <div class="s13-fw s13-demo">
       <div>
         <div class="jtag-box">
           <div class="jb-header">// JTAG STATUS</div>
@@ -392,15 +453,37 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
           <span class="comment">; fires DURING every factory reset</span><br>
           <span class="comment">; not before. not after. during.</span>
         </div>
-        <div class="demo-callout">
-          [ VIDEO: factory reset &middot; backdoor code surviving ]
-          <span class="demo-sub">cue at ~34:00 &middot; narrate lightly or let it run &middot; the video is self-explanatory</span>
-        </div>
+        <figure class="exhibit exhibit-video">
+          <video controls preload="metadata" playsinline
+                 poster="video/factory-reset-demo-poster.jpg"
+                 onerror="this.style.display='none';this.parentElement.querySelector('.exhibit-fallback').style.display='flex';">
+            <source src="video/factory-reset-demo.mp4" type="video/mp4">
+          </video>
+          <div class="exhibit-fallback demo-callout">
+            [ VIDEO: factory reset &middot; backdoor code surviving ]
+            <span class="demo-sub">cue at ~34:00 &middot; narrate lightly or let it run &middot; the video is self-explanatory</span>
+          </div>
+          <figcaption><span class="ex-tag">[DEMO] factory reset &middot; backdoor survives</span>non-factory code &rarr; reset &rarr; factory default works AND 696969 works &rarr; "AL" enters programming mode.</figcaption>
+        </figure>
         <div class="fw-punchline">
           "Factory reset. Enters 696969. Opens."<br>
           Survived multiple resets. Survived multiple boards.<br>
           38 bytes of TI assembly. Written by a locksmith with bad ideas.
         </div>
+      </div>
+      <div class="s13-evidence">
+        <figure class="exhibit">
+          <img src="img/13-ghidra-dump.jpg" alt="Ghidra disassembly of msp430FullDump.bin"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">ghidra · msp430FullDump.bin</span>disassembly was limited — but it was a starting point, and it was proof the dump was real.</div>
+          <figcaption><span class="ex-tag">ghidra · the dump</span>limited disassembly. a starting point. proof of extraction.</figcaption>
+        </figure>
+        <figure class="exhibit">
+          <img src="img/02-greatfet-jtag.jpg" alt="PCBite probes on the JTAG debug ports jumpered to a GreatFET One"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">PCBite probes &rarr; JTAG &rarr; GreatFET</span>probes on the debug ports, jumpered to a GreatFET One, USB to the laptop. that's the access.</div>
+          <figcaption><span class="ex-tag">probes on the JTAG ports</span>GreatFET One on the debug pads. that's the access.</figcaption>
+        </figure>
       </div>
     </div>
     <div class="brand">dead-bytes.deck</div>
@@ -455,7 +538,47 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
         </div>
       </div>
     </div>
-    <div class="s15-footer" style="margin-top:22px">audit log integrity is left as an exercise.</div>
+    <div class="s15-footer" style="margin-top:14px">audit log integrity is left as an exercise.</div>
+    <div class="s15-identify">
+      <figure class="exhibit s15-zoom">
+        <img src="img/19-device-manager-zoom.jpg" alt="Enlarged CP210x USB to UART Bridge Properties dialog: Device type, Manufacturer, Location — the cable-identification pop-out"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">CP210x identification</span>CP210x USB to UART Bridge &middot; Device type &middot; Manufacturer &middot; Location. this is the entire identity the software checks.</div>
+        <figcaption><span class="ex-tag">what the software checks</span>CP210x USB to UART Bridge. device type, manufacturer, location. that's the whole identity.</figcaption>
+      </figure>
+      <figure class="exhibit s15-context">
+        <img src="img/19-device-manager.jpg" alt="Windows Device Manager showing the CP210x USB-UART device the cable must present as"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">what it must look like</span>DL-Windows only talks to a cable that shows up as a CP210x USB-UART. that's the whole trust check.</div>
+        <figcaption><span class="ex-tag">1 &middot; what it must look like</span>show up as a CP210x USB-UART. that's the trust check.</figcaption>
+      </figure>
+    </div>
+    <div class="brand">dead-bytes.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S15b — LAYER 4 (cont.): the rig that fakes the cable
+     Split off from S15 so the CP210x identity zoom can be the dominant,
+     legible hero on S15 and the two rig exhibits get full size here.
+     =================================================================== -->
+<section id="s15b-cable-rig" data-slide="S15b">
+  <div class="slide tight">
+    <div class="anchor">LAYER 4 &middot; build the fake cable</div>
+    <div class="s15-photos">
+      <figure class="exhibit">
+        <img src="img/20-facedancer-rig.jpg" alt="FaceDancer plus GreatFET One rig wired between two laptops"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">the rig that fakes it</span>FaceDancer + GreatFET One between two laptops, presenting the descriptors DL-Windows wants to see.</div>
+        <figcaption><span class="ex-tag">2 &middot; the rig that fakes it</span>FaceDancer + GreatFET One. it presents the descriptors.</figcaption>
+      </figure>
+      <figure class="exhibit ex-amber">
+        <img src="img/21-spoof-script.jpg" alt="The spoof script with audit-cable traffic captured in Wireshark"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">the fake cable</span>audit-cable traffic captured in Wireshark, replayed by the script. now you are the cable.</div>
+        <figcaption><span class="ex-tag">3 &middot; the fake cable</span>traffic captured in Wireshark, replayed. now you're the cable.</figcaption>
+      </figure>
+    </div>
     <div class="brand">dead-bytes.deck</div>
   </div>
 </section>
@@ -514,9 +637,88 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
 </section>
 
 <!-- ===================================================================
+     S16b — Rewriting the Audit Log (before → after → printed proof)
+     SYSTEMIC PROBLEM (setup) · 43:00–45:00
+     Concrete demonstration that the audit log is attacker-rewritable:
+     "@Alarm Lock" → "HACK THE PLANET!!!" lands on a thermal print
+     audit. The two Ghidra shots show the same audit events are the
+     ones sometimes used in court — and they are modifiable.
+     This slide carries the mechanism so S17 can stay the clean thesis.
+     =================================================================== -->
+<section id="s16b-audit-rewrite" data-slide="S16b">
+  <div class="slide tight">
+    <div class="anchor">SYSTEMIC PROBLEM &middot; the audit log rewrites</div>
+    <div class="s16b-rewrite">
+      <div class="s16b-flow">
+        <figure class="exhibit">
+          <img src="img/15-string-before.jpg" alt="The original string table value: @Alarm Lock"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">before</span>the original string in the table: "@Alarm Lock". this is what a clean audit prints.</div>
+          <figcaption><span class="ex-tag">before</span>"@Alarm Lock" — the original string.</figcaption>
+        </figure>
+        <div class="flow-arrow">&rarr;</div>
+        <figure class="exhibit ex-amber">
+          <img src="img/14-string-after.jpg" alt="The edited string table value: HACK THE PLANET!!!"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">after</span>I changed it to "HACK THE PLANET!!!" so it would print on a thermal audit. one string edit.</div>
+          <figcaption><span class="ex-tag">after</span>changed it to "HACK THE PLANET!!!" — one string edit.</figcaption>
+        </figure>
+      </div>
+      <div class="s16b-proof">
+        <figure class="exhibit ex-red s16b-hero">
+          <img src="img/16-thermal-receipt.jpg" alt="Printed thermal audit receipt reading HACK THE PLANET"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">printed proof</span>the thermal audit receipt prints "HACK THE PLANET". the log itself is attacker-rewritable.</div>
+          <figcaption><span class="ex-tag">printed proof</span>the audit receipt prints what I told it to.</figcaption>
+        </figure>
+        <div class="s16b-thesisline">
+          the string on a printed audit is whatever I last wrote to the chip. so are the events on it.
+        </div>
+      </div>
+    </div>
+    <div class="brand">dead-bytes.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
+     S16c — The Audit Events Themselves Are Modifiable
+     SYSTEMIC PROBLEM (setup, cont.) · 43:00–45:00
+     Split off from S16b so neither slide is cramped. The two Ghidra
+     shots show the same audit-event records that are sometimes used
+     in court — and that they are modifiable, with no court-grade
+     protection.
+     =================================================================== -->
+<section id="s16c-audit-events" data-slide="S16c">
+  <div class="slide tight">
+    <div class="anchor">SYSTEMIC PROBLEM &middot; the audit events are modifiable</div>
+    <div class="s16c-events">
+      <div class="s16c-heading">not just the banner. the audit events go to court &mdash; and they edit just as easily.</div>
+      <div class="s16b-audit-pair">
+        <figure class="exhibit">
+          <img src="img/17-ghidra-audit-templates.jpg" alt="Ghidra showing audit-event templates: Print Audit, DELETED, Key Entry"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">audit-event templates</span>Print Audit · DELETED · Key Entry. these are the events that sometimes go to court — and they're modifiable.</div>
+          <figcaption><span class="ex-tag">the audit events</span>Print Audit · DELETED · Key Entry. sometimes used in court. modifiable.</figcaption>
+        </figure>
+        <figure class="exhibit">
+          <img src="img/18-ghidra-audit-dump.jpg" alt="Ghidra hackThePlanetDump showing more modifiable audit entries"
+               onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div class="exhibit-fallback"><span class="efb-tag">more audit entries</span>more of the same in the dump — no court-grade protection on any of it.</div>
+          <figcaption><span class="ex-tag">no court-grade protection</span>more audit entries. nothing protecting any of them.</figcaption>
+        </figure>
+      </div>
+    </div>
+    <div class="brand">dead-bytes.deck</div>
+  </div>
+</section>
+
+<!-- ===================================================================
      S17 — The Systemic Problem
-     SYSTEMIC PROBLEM · 43:00–44:30
+     SYSTEMIC PROBLEM · 45:00–46:00
      The argument. "self-auditing endpoint" is the named thesis.
+     Stays clean: the centered declaration is the beat. One small
+     supporting exhibit (the printed HACK THE PLANET receipt) anchors
+     it to the mechanism shown on S16b without crowding the thesis.
      =================================================================== -->
 <section id="s17-systemic" data-slide="S17">
   <div class="slide center">
@@ -532,6 +734,12 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
         actor = chronicler &middot; manipulate one &rarr; manipulate both<br>
         self-auditing endpoint &mdash; not specific to this lock
       </div>
+      <figure class="exhibit ex-red s17-exhibit">
+        <img src="img/16-thermal-receipt.jpg" alt="Printed thermal audit receipt reading HACK THE PLANET"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">its own alibi</span>the audit it printed: "HACK THE PLANET". whatever I last wrote.</div>
+        <figcaption><span class="ex-tag">the alibi it wrote</span>the audit it printed. whatever I last told it to say.</figcaption>
+      </figure>
     </div>
     <div class="brand">dead-bytes.deck</div>
   </div>
@@ -618,7 +826,7 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
     <div class="anchor">CLOSE</div>
     <div class="s20-close">
       <div class="close-resources">
-        <span class="cr-url">github.com/qweary/dead-bytes</span>
+        <span class="cr-url">code: github.com/qweary &middot; writeups: qweary.github.io</span>
         <span class="cr-line">code &middot; firmware dumps &middot; SOP8 clip wiring &middot; FaceDancer scripts &middot; pcap files</span>
         <span class="cr-line">33 pages of handwritten notes &mdash; including all the wrong turns</span>
         <span class="cr-line">blog series: five parts &middot; July&ndash;August 2025</span>
@@ -634,7 +842,13 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
         </div>
         <div class="close-punchline">"&mdash; maybe you should be."</div>
       </div>
-      <div class="close-handle">Qweary &middot; workshop: [TIME/LOCATION] &middot; questions welcome</div>
+      <figure class="exhibit ex-red s20-exhibit">
+        <img src="img/16-thermal-receipt.jpg" alt="Printed thermal audit receipt reading HACK THE PLANET"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <div class="exhibit-fallback"><span class="efb-tag">HACK THE PLANET</span>the lock printed it. so can you. it's all in the repo.</div>
+        <figcaption><span class="ex-tag">HACK THE PLANET</span>the lock printed it. it's all in the repo.</figcaption>
+      </figure>
+      <div class="close-handle">Qweary &middot; workshop: June 27 &middot; 17:30 &middot; Yoga Studio &middot; questions welcome</div>
     </div>
     <div class="brand">dead-bytes.deck</div>
   </div>
@@ -673,7 +887,7 @@ permission flags:  F1 = Master &nbsp; E1 = Elevated &nbsp; C1 = Supervisor</span
         <span class="bpc-line">696969 opens the door. survived multiple boards.</span>
       </div>
     </div>
-    <div class="bp-footer" style="margin-top:22px">everything is in the repo. all of this is replicable. github.com/qweary/dead-bytes</div>
+    <div class="bp-footer" style="margin-top:22px">everything is in the repo. all of this is replicable. github.com/qweary &middot; qweary.github.io</div>
     <div class="brand">dead-bytes.deck &middot; back-pocket</div>
   </div>
 </section>

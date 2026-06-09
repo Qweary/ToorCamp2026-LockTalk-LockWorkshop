@@ -1,0 +1,26 @@
+# Talk media — kept off-repo to keep this clone lightweight.
+# Attendees do not need the full-resolution photos and video; they are
+# distributed as a single zip and dropped back in with talk/rehydrate-media.sh.
+# See talk/README.md ("Showing the deck with media").
+talk/img/*
+talk/video/*
+
+# ...but keep the directory placeholders so a fresh clone shows the dirs
+# exist and explains how to fill them.
+!talk/img/README.md
+!talk/video/README.md
+
+# Stray copies of the media zip if it gets downloaded into the repo tree.
+toorcamp-media.zip
+
+# Python bytecode caches. The workshop tools import each other at runtime, which
+# can generate __pycache__/ next to whichever tool ran. These are build
+# artifacts — never tracked, never shipped in the kit (the Makefile and
+# gen-manifest also exclude them so they cannot enter the tarball or the MD5
+# manifest).
+__pycache__/
+*.pyc
+
+# Built kit tarball — `make tarball` output, reproducible from source. A build
+# artifact, not source; rebuild any time with `make tarball` from workshop/kit/.
+workshop/facilitator-kit-toorcamp-2026.tar.gz

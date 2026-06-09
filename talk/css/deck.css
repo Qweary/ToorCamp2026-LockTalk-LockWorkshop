@@ -62,9 +62,9 @@
   --redm:#c02040;
 
   /* text */
-  --w:#c8e6c9;            /* off-white / green-tinted */
-  --gr:#4a7a55;           /* muted green text */
-  --bdr:#0a2010;          /* border color */
+  --w:#dcf3dd;            /* off-white / green-tinted (brightened for distance legibility) */
+  --gr:#6fa97d;           /* muted green text (brightened from #4a7a55 for distance legibility) */
+  --bdr:#16401f;          /* border color (lifted from #0a2010 so frames read at distance) */
 
   /* glows */
   --gg:0 0 10px rgba(0,230,118,.40);
@@ -78,8 +78,8 @@ html, body{
 }
 .reveal{
   font-family:'Share Tech Mono','Courier New',monospace;
-  font-size:24px;
-  color:var(--w);
+  font-size:28px;
+  color:#dcf3dd;
   font-weight:400;
 }
 .reveal .slides{
@@ -167,11 +167,11 @@ body.no-scanline::after{display:none}
 /* Section anchor tag — top-left console prompt */
 .anchor{
   font-family:'Share Tech Mono',monospace;
-  font-size:11px;
+  font-size:15px;
   letter-spacing:3px;
-  color:#1e4a2a;
+  color:#3a7a4d;
   position:absolute;
-  top:30px;
+  top:28px;
   left:72px;
 }
 .anchor::before{content:'// '}
@@ -267,9 +267,9 @@ body.no-scanline::after{display:none}
 }
 .s2-reveal .pivot-line{
   font-family:'Share Tech Mono',monospace;
-  font-size:22px;
-  letter-spacing:2px;
-  color:var(--gr);
+  font-size:24px;
+  letter-spacing:1.5px;
+  color:#8fc49b;
   margin-top:14px;
 }
 
@@ -302,9 +302,9 @@ body.no-scanline::after{display:none}
 }
 .s3-bio .repo-ref{
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;
-  letter-spacing:1.5px;
-  color:var(--gr);
+  font-size:21px;
+  letter-spacing:1.3px;
+  color:#8fc49b;
   margin-top:14px;
   line-height:1.7;
 }
@@ -313,9 +313,9 @@ body.no-scanline::after{display:none}
 .divider{padding:64px 72px}
 .divider .chapter-num{
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
+  font-size:22px;
   letter-spacing:5px;
-  color:var(--gr);
+  color:#8fc49b;
   margin-bottom:8px;
 }
 .divider .chapter{
@@ -339,9 +339,9 @@ body.no-scanline::after{display:none}
 }
 .divider .sub{
   font-family:'Share Tech Mono',monospace;
-  font-size:20px;
+  font-size:24px;
   letter-spacing:2.5px;
-  color:var(--gr);
+  color:#8fc49b;
   margin-top:24px;
 }
 
@@ -352,7 +352,7 @@ body.no-scanline::after{display:none}
 /* S8, S10, S12, S14 — layer dividers — green */
 .ch-layer .chapter{color:var(--g);text-shadow:var(--gg)}
 
-/* ---------- S5 — ANE-003 quote beat ---------- */
+/* ---------- S5 — quote beat ---------- */
 .s5-rel{
   display:flex;
   flex-direction:column;
@@ -361,10 +361,10 @@ body.no-scanline::after{display:none}
 }
 .s5-rel .timeline{
   font-family:'Share Tech Mono',monospace;
-  font-size:20px;
-  letter-spacing:1.5px;
+  font-size:24px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.9;
+  line-height:1.85;
 }
 .s5-rel .timeline .tl-entry{display:block}
 .s5-rel .timeline .tl-entry::before{content:'> ';color:var(--gd)}
@@ -389,9 +389,10 @@ body.no-scanline::after{display:none}
 }
 .s5-rel .followup{
   font-family:'Share Tech Mono',monospace;
-  font-size:20px;
-  letter-spacing:2px;
-  color:var(--gr);
+  font-size:22px;
+  letter-spacing:1.5px;
+  color:#8fc49b;
+  line-height:1.6;
 }
 
 /* ---------- S6 — Anatomy ---------- */
@@ -416,24 +417,25 @@ body.no-scanline::after{display:none}
 }
 .s6-anatomy .components{
   font-family:'Share Tech Mono',monospace;
-  font-size:22px;
+  font-size:26px;
   letter-spacing:1.5px;
   color:var(--w);
   line-height:2.0;
 }
 .s6-anatomy .components .lbl{
-  color:var(--gr);
+  color:var(--gm);
   display:inline-block;
-  min-width:80px;
+  min-width:92px;
 }
 .s6-anatomy .callout{
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
+  font-size:22px;
   letter-spacing:1.5px;
   color:var(--gm);
   margin-top:32px;
   padding-top:22px;
   border-top:1px solid var(--bdr);
+  line-height:1.6;
 }
 
 /* ---------- S7 — Five Layers overview ---------- */
@@ -457,24 +459,24 @@ body.no-scanline::after{display:none}
 .layer-row .lnum{
   font-family:'Orbitron',sans-serif;
   font-weight:900;
-  font-size:18px;
+  font-size:24px;
   letter-spacing:3px;
-  color:var(--gd);
-  min-width:44px;
-  border:1px solid var(--gd);
+  color:var(--gm);
+  min-width:50px;
+  border:2px solid var(--gm);
   text-align:center;
-  padding:4px 8px;
+  padding:6px 10px;
 }
 .layer-row .lname{
-  font-size:20px;
+  font-size:26px;
   letter-spacing:3px;
   color:var(--g);
-  min-width:240px;
+  min-width:280px;
 }
 .layer-row .ldesc{
-  font-size:17px;
+  font-size:22px;
   letter-spacing:1.5px;
-  color:var(--gr);
+  color:#8fc49b;
 }
 
 /* ---------- S9 — Layer 1 content (service member story) ---------- */
@@ -486,26 +488,26 @@ body.no-scanline::after{display:none}
 }
 .attack-list{
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:23px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:2.1;
+  line-height:2.0;
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:22px 28px;
+  padding:24px 30px;
 }
-.attack-list .atk-num{color:var(--gm);margin-right:8px}
-.attack-list .atk-desc{color:var(--gr);margin-left:8px}
+.attack-list .atk-num{color:var(--g);margin-right:8px}
+.attack-list .atk-desc{color:#8fc49b;margin-left:8px}
 .story-box{
-  border-left:5px solid var(--amber);
-  background:rgba(240,165,0,.03);
-  padding:18px 24px;
+  border-left:6px solid var(--amber);
+  background:rgba(240,165,0,.04);
+  padding:20px 26px;
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:22px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.9;
-  max-width:1200px;
+  line-height:1.85;
+  max-width:1300px;
 }
 .story-box .story-line{display:block}
 .story-box .story-line::before{content:'  ';white-space:pre}
@@ -533,18 +535,18 @@ body.no-scanline::after{display:none}
 }
 .hex-block{
   font-family:'Share Tech Mono',monospace;
-  font-size:20px;
+  font-size:23px;
   letter-spacing:1.5px;
   color:var(--g);
   background:var(--bp);
   border:1px solid var(--bdr);
-  padding:18px 24px;
+  padding:20px 26px;
   line-height:1.6;
-  text-shadow:0 0 6px rgba(0,230,118,.18);
+  text-shadow:0 0 6px rgba(0,230,118,.20);
 }
 .hex-block .hex-annot{
-  color:var(--gr);
-  font-size:15px;
+  color:#7fb88c;
+  font-size:18px;
   letter-spacing:1px;
   display:block;
   margin-top:6px;
@@ -563,39 +565,39 @@ body.no-scanline::after{display:none}
 }
 .callout-amber{
   border:2px solid var(--amber);
-  border-left-width:5px;
-  background:rgba(240,165,0,.03);
-  padding:16px 22px;
+  border-left-width:6px;
+  background:rgba(240,165,0,.04);
+  padding:18px 24px;
   font-family:'Share Tech Mono',monospace;
-  font-size:17px;
+  font-size:21px;
   letter-spacing:1.5px;
   color:var(--w);
-  line-height:1.85;
+  line-height:1.8;
 }
 .callout-amber .ca-line{display:block}
 .callout-amber .ca-label{
-  font-size:12px;
+  font-size:15px;
   letter-spacing:2.5px;
-  color:var(--amberd);
+  color:var(--amber);
   display:block;
   margin-bottom:8px;
 }
 .callout-red{
   border:2px solid var(--red);
-  border-left-width:5px;
-  background:rgba(255,51,85,.03);
-  padding:16px 22px;
+  border-left-width:6px;
+  background:rgba(255,51,85,.04);
+  padding:18px 24px;
   font-family:'Share Tech Mono',monospace;
-  font-size:17px;
+  font-size:21px;
   letter-spacing:1.5px;
   color:var(--w);
-  line-height:1.85;
+  line-height:1.8;
 }
 .callout-red .ca-line{display:block}
 .callout-red .ca-label{
-  font-size:12px;
+  font-size:15px;
   letter-spacing:2.5px;
-  color:var(--redm);
+  color:var(--red);
   display:block;
   margin-bottom:8px;
 }
@@ -623,9 +625,9 @@ body.no-scanline::after{display:none}
   background:var(--bp);
   padding:20px 22px;
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;
-  letter-spacing:1.5px;
-  line-height:2.0;
+  font-size:19px;
+  letter-spacing:1.3px;
+  line-height:1.95;
 }
 .jtag-box .jb-header{
   font-family:'Orbitron',sans-serif;
@@ -668,19 +670,19 @@ body.no-scanline::after{display:none}
   border-bottom:1px solid var(--bdr);
   padding-bottom:6px;
 }
-.payload-block .comment{color:var(--gr);font-size:16px}
+.payload-block .comment{color:#7fb88c;font-size:18px}
 .payload-block .op{color:var(--amber)}
 .payload-block .addr{color:var(--gm)}
 
 .outcome-list{
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:14px 22px;
+  padding:16px 24px;
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;
-  letter-spacing:1.5px;
+  font-size:19px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.9;
+  line-height:1.85;
 }
 .outcome-list .ol-line{display:block}
 .outcome-list .ol-line::before{content:'✓ ';color:var(--g)}
@@ -711,10 +713,10 @@ body.no-scanline::after{display:none}
 
 .fw-punchline{
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
-  color:var(--gr);
-  line-height:1.7;
+  font-size:20px;
+  letter-spacing:1.3px;
+  color:#8fc49b;
+  line-height:1.65;
 }
 
 /* ---------- S15 — Descriptor trust ---------- */
@@ -728,12 +730,12 @@ body.no-scanline::after{display:none}
 .cable-box{
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:22px 26px;
+  padding:22px 28px;
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:21px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:2.1;
+  line-height:2.0;
 }
 .cable-box .cb-header{
   font-family:'Orbitron',sans-serif;
@@ -761,13 +763,13 @@ body.no-scanline::after{display:none}
 }
 .cable-quote{
   margin-top:10px;
-  padding-left:14px;
-  border-left:4px solid var(--amber);
+  padding-left:16px;
+  border-left:5px solid var(--amber);
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:20px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.9;
+  line-height:1.8;
 }
 .s15-footer{
   font-family:'Share Tech Mono',monospace;
@@ -811,35 +813,35 @@ body.no-scanline::after{display:none}
   flex:1;
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:14px 22px;
+  padding:18px 26px;
   margin-left:14px;
   margin-bottom:4px;
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:22px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.7;
+  line-height:1.6;
 }
-.chain-content .cl{color:var(--g);display:inline-block;min-width:160px;font-size:14px;letter-spacing:3px}
+.chain-content .cl{color:var(--g);display:inline-block;min-width:185px;font-size:18px;letter-spacing:3px}
 .chain-end{
   border:2px solid var(--g);
-  background:rgba(0,230,118,.04);
-  padding:18px 26px;
+  background:rgba(0,230,118,.05);
+  padding:20px 28px;
   margin-top:14px;
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:1.5px;
+  font-size:22px;
+  letter-spacing:1.3px;
   color:var(--g);
-  line-height:1.9;
-  text-shadow:0 0 6px rgba(0,230,118,.18);
-  max-width:1400px;
+  line-height:1.8;
+  text-shadow:0 0 6px rgba(0,230,118,.20);
+  max-width:1500px;
 }
 .chain-end .supply-note{
   display:block;
   margin-top:12px;
-  font-size:15px;
-  letter-spacing:1.5px;
-  color:var(--gr);
+  font-size:19px;
+  letter-spacing:1.3px;
+  color:#8fc49b;
   text-shadow:none;
 }
 
@@ -896,12 +898,12 @@ body.no-scanline::after{display:none}
 .osm-diagram{
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:26px 32px;
+  padding:28px 34px;
   font-family:'Share Tech Mono',monospace;
-  font-size:17px;
-  letter-spacing:1.5px;
+  font-size:21px;
+  letter-spacing:1.2px;
   color:var(--w);
-  line-height:2.1;
+  line-height:2.0;
 }
 .osm-diagram .osd-line{display:block}
 .osm-diagram .osd-sensor{color:var(--gm)}
@@ -909,19 +911,19 @@ body.no-scanline::after{display:none}
 .osm-diagram .osd-node{color:var(--g);text-shadow:0 0 6px rgba(0,230,118,.3)}
 .osm-check{
   font-family:'Share Tech Mono',monospace;
-  font-size:20px;
-  letter-spacing:2px;
+  font-size:24px;
+  letter-spacing:1.5px;
   color:var(--w);
-  line-height:1.9;
+  line-height:1.85;
 }
 .osm-check .ck-line{display:block}
 .osm-check .ck-q{color:var(--amber)}
 .osm-check .ck-r{color:var(--red)}
 .osm-callout{
   font-family:'Share Tech Mono',monospace;
-  font-size:18px;
-  letter-spacing:2px;
-  color:var(--gr);
+  font-size:22px;
+  letter-spacing:1.5px;
+  color:#8fc49b;
 }
 
 /* ---------- S19 — $5 Fix ---------- */
@@ -939,31 +941,31 @@ body.no-scanline::after{display:none}
 .fix-table .ft-header{
   display:grid;
   grid-template-columns:1fr 1fr;
-  padding:10px 24px;
-  background:rgba(0,230,118,.03);
+  padding:12px 26px;
+  background:rgba(0,230,118,.04);
   border-bottom:1px solid var(--bdr);
-  font-size:12px;
+  font-size:15px;
   letter-spacing:3px;
-  color:var(--gd);
+  color:var(--gm);
 }
 .fix-table .ft-row{
   display:grid;
   grid-template-columns:1fr 1fr;
-  padding:18px 24px;
+  padding:20px 26px;
   border-bottom:1px solid var(--bdr);
-  font-size:19px;
-  letter-spacing:1.5px;
+  font-size:23px;
+  letter-spacing:1.3px;
   align-items:center;
 }
 .fix-table .ft-row:last-child{border-bottom:none}
 .fix-table .ft-row .ft-mit{color:var(--w)}
-.fix-table .ft-row .ft-mit .ft-action{color:var(--g);display:inline-block;min-width:240px}
+.fix-table .ft-row .ft-mit .ft-action{color:var(--g);display:inline-block;min-width:280px}
 .fix-table .ft-row .ft-result{
-  color:var(--gr);
-  font-size:16px;
-  letter-spacing:1.5px;
+  color:#8fc49b;
+  font-size:20px;
+  letter-spacing:1.3px;
 }
-.fix-table .ft-row .ft-result .killed{color:var(--redm)}
+.fix-table .ft-row .ft-result .killed{color:var(--red)}
 .s19-cost{
   font-family:'Share Tech Mono',monospace;
   font-size:24px;
@@ -973,10 +975,10 @@ body.no-scanline::after{display:none}
 }
 .s19-note{
   font-family:'Share Tech Mono',monospace;
-  font-size:17px;
-  letter-spacing:1.5px;
-  color:var(--gr);
-  line-height:1.7;
+  font-size:21px;
+  letter-spacing:1.3px;
+  color:#8fc49b;
+  line-height:1.65;
 }
 .s19-note .amber{color:var(--amber)}
 
@@ -990,12 +992,12 @@ body.no-scanline::after{display:none}
 .close-resources{
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:22px 28px;
+  padding:22px 30px;
   font-family:'Share Tech Mono',monospace;
-  font-size:17px;
-  letter-spacing:1.5px;
-  color:var(--gr);
-  line-height:2.0;
+  font-size:21px;
+  letter-spacing:1.3px;
+  color:#8fc49b;
+  line-height:1.9;
 }
 .close-resources .cr-url{
   color:var(--gm);
@@ -1028,9 +1030,9 @@ body.no-scanline::after{display:none}
 }
 .close-handle{
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;
-  letter-spacing:2.5px;
-  color:var(--gr);
+  font-size:20px;
+  letter-spacing:2px;
+  color:#8fc49b;
 }
 
 /* ---------- Back-pocket slide ---------- */
@@ -1044,12 +1046,12 @@ body.no-scanline::after{display:none}
 .bp-col{
   border:1px solid var(--bdr);
   background:var(--bp);
-  padding:20px 26px;
+  padding:22px 28px;
   font-family:'Share Tech Mono',monospace;
-  font-size:16px;
-  letter-spacing:1.5px;
+  font-size:20px;
+  letter-spacing:1.3px;
   color:var(--w);
-  line-height:1.9;
+  line-height:1.85;
 }
 .bp-col .bpc-header{
   font-family:'Orbitron',sans-serif;
@@ -1069,6 +1071,304 @@ body.no-scanline::after{display:none}
   letter-spacing:2px;
   color:var(--gr);
 }
+
+/* ====================================================================
+   EVIDENCE EXHIBITS — photos & video as evidence-board artifacts
+   Terminal-green frames, mono caption labels, graceful media-absent
+   fallback. Images are staged at 4000x3000 and rendered on an 85" 4K
+   TV at talk time; sized to render large + crisp. Committed public
+   repo has NO media — the .exhibit-fallback box stands in, captioned,
+   so a fresh clone never shows a broken-image icon.
+   ==================================================================== */
+
+/* Figure wrapper — frames every photo as a console exhibit */
+.exhibit{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  margin:0;
+  border:2px solid var(--gm);
+  background:var(--bp);
+  box-shadow:0 0 14px rgba(0,230,118,.16);
+  overflow:hidden;
+  min-height:0;
+}
+.exhibit img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  background:#010a05;
+  min-height:0;
+}
+/* Portrait video sits inside an exhibit frame, contained to a sane height */
+.exhibit.exhibit-video video{
+  display:block;
+  width:100%;
+  max-height:760px;
+  object-fit:contain;
+  background:#010a05;
+}
+/* Caption strip — mono, in the talk's voice, reads like an evidence tag */
+.exhibit figcaption{
+  font-family:'Share Tech Mono',monospace;
+  font-size:19px;
+  letter-spacing:1.2px;
+  color:#bfe6c6;
+  padding:11px 16px;
+  border-top:1px solid var(--bdr);
+  background:rgba(0,0,0,.45);
+  line-height:1.4;
+}
+.exhibit figcaption .ex-tag{
+  color:var(--gm);
+  font-size:14px;
+  letter-spacing:2.5px;
+  display:block;
+  margin-bottom:4px;
+}
+.exhibit figcaption .ex-tag::before{content:'// '}
+/* Amber-keyed exhibits (DL-Windows / audit-rewrite beats) */
+.exhibit.ex-amber{border-color:var(--amber);box-shadow:0 0 14px rgba(240,165,0,.16)}
+.exhibit.ex-amber figcaption .ex-tag{color:var(--amber)}
+/* Red-keyed exhibits (the failure / disaster beats) */
+.exhibit.ex-red{border-color:var(--red);box-shadow:0 0 14px rgba(255,51,85,.16)}
+.exhibit.ex-red figcaption .ex-tag{color:var(--red)}
+
+/* Media-absent fallback — revealed by <img onerror> / <video onerror>.
+   Mirrors the .photo-placeholder aesthetic: 2px dashed green, dark
+   green wash, mono label naming what the photo shows. Hidden by
+   default; the inline onerror flips display + hides the broken media. */
+.exhibit .exhibit-fallback{
+  display:none;
+  flex:1;
+  min-height:140px;
+  border:2px dashed var(--gm);
+  background:rgba(0,77,26,.12);
+  color:#7fc090;
+  font-family:'Share Tech Mono',monospace;
+  font-size:18px;
+  letter-spacing:1.2px;
+  line-height:1.55;
+  padding:20px 24px;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+}
+.exhibit .exhibit-fallback .efb-tag{
+  font-size:14px;
+  letter-spacing:3px;
+  color:var(--g);
+  margin-bottom:9px;
+}
+.exhibit .exhibit-fallback .efb-tag::before{content:'[ no media · '}
+.exhibit .exhibit-fallback .efb-tag::after{content:' ]'}
+.exhibit.ex-amber .exhibit-fallback{border-color:var(--amberd);color:var(--amberd)}
+.exhibit.ex-amber .exhibit-fallback .efb-tag{color:var(--amberm)}
+.exhibit.ex-red .exhibit-fallback{border-color:var(--redm);color:var(--redm)}
+.exhibit.ex-red .exhibit-fallback .efb-tag{color:var(--red)}
+
+/* ---------- S6 — anatomy: board + macro pair beside components ---------- */
+.s6-anatomy{
+  grid-template-columns:1.7fr 1fr;
+  gap:44px;
+}
+.s6-photos{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:1.5fr 1fr;
+  gap:16px;
+  height:780px;
+}
+.s6-photos .exhibit:first-child{grid-column:1 / span 2}
+.s6-photos .exhibit:first-child img{max-height:440px}
+
+/* ---------- S10 / S12 — divider hero image ---------- */
+.divider.has-hero{
+  display:grid;
+  grid-template-columns:.92fr 1.08fr;
+  gap:56px;
+  align-items:center;
+}
+.divider.has-hero .divider-text{display:flex;flex-direction:column}
+.divider .divider-hero{
+  align-self:center;
+  width:100%;
+  max-height:880px;
+}
+.divider .divider-hero img{max-height:880px}
+
+/* ---------- S11 — NAND: three exhibits in a row under the hex ---------- */
+.s11-photos{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:18px;
+  height:430px;
+}
+.s11-photos .exhibit img{max-height:380px}
+
+/* ---------- S13 — demo video + RE evidence on the firmware payoff ---------- */
+.s13-fw.s13-demo{
+  grid-template-columns:300px 1fr 400px;
+  gap:26px;
+}
+.s13-demo .s13-evidence{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  min-width:0;
+}
+.s13-demo .s13-evidence .exhibit img{max-height:300px}
+/* portrait demo video — sized as large as the firmware payoff slide allows;
+   native <video> controls expose the fullscreen button (nothing overlays it) */
+.s13-demo .exhibit.exhibit-video video{max-height:760px}
+/* video cue box rides beneath the video as a caption-style fallback line */
+.s13-demo .demo-callout{
+  font-size:20px;
+  letter-spacing:3px;
+  padding:14px 18px;
+}
+.s13-demo .demo-callout .demo-sub{font-size:15px;margin-top:6px}
+
+/* ---------- S15 — cable identification: large CP210x zoom inset ----------
+   The zoom shot (19-device-manager-zoom.jpg) is the legibility hero — the
+   CP210x USB to UART Bridge / Device type / Manufacturer / Location text
+   must read at distance. It gets the dominant column; the full Device
+   Manager shot rides beside it for context. */
+/* zoom is the legible HERO of the identity beat; context shot is a small
+   supporting inset. The rig exhibits moved to S15b, freeing the vertical
+   budget so the CP210x identity zoom can run tall and read at distance.
+   The zoom source is LANDSCAPE 2650x2200 (1.205:1) — the whole CP210x
+   Properties dialog. The frame is given a matching 1.205:1 aspect so the
+   full dialog (title, device name, Device type, Manufacturer, Location)
+   fills edge-to-edge with no crop and no letterbox bars. */
+.s15-identify{
+  display:flex;
+  align-items:flex-start;
+  gap:22px;
+  margin-top:18px;
+}
+/* hero zoom: the IMG itself carries the source aspect (2650x2200) at a fixed
+   height, so its box is exactly 1.205:1 — cover == contain, the ENTIRE
+   Properties dialog (title, device name, Device type, Manufacturer, Location)
+   shows large with no crop and no letterbox. The figure shrink-wraps the img
+   and lets the caption strip sit beneath it; sizing the img (not the figure)
+   keeps the caption out of the aspect-ratio math. */
+.s15-identify .s15-zoom{flex:0 0 auto;align-self:flex-start}
+.s15-identify .s15-zoom img{
+  height:470px;
+  width:566px;
+  flex:0 0 auto;
+  align-self:flex-start;
+  object-fit:cover;
+  object-position:center;
+}
+/* context shot is the small supporting inset beside the dominant zoom */
+.s15-identify .s15-context{flex:1 1 auto;min-width:0;align-self:stretch}
+.s15-identify .s15-context img{height:470px;width:100%;object-fit:contain}
+/* zoom inset reads as the callout — brighter green frame to pull the eye */
+.s15-identify .s15-zoom{border-color:var(--g);box-shadow:0 0 22px rgba(0,230,118,.3)}
+
+/* ---------- S15b — cable: the two rig exhibits, full size ---------- */
+.s15-photos{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  height:760px;
+  margin-top:22px;
+}
+.s15-photos .exhibit img{max-height:660px}
+
+/* ---------- S16b — audit-log rewrite mechanism (before → after → hero proof)
+   Split from the original crowded slide: the before→after string edit sits
+   on top, the thermal-receipt PROOF is the hero below. The Ghidra audit-event
+   pair moved to S16c. ---------- */
+.s16b-rewrite{
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  max-width:1500px;
+  margin:0 auto;
+  width:100%;
+}
+.s16b-flow{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  gap:24px;
+  align-items:center;
+  height:320px;
+  max-width:1100px;
+  margin:0 auto;
+  width:100%;
+}
+.s16b-flow .flow-arrow{
+  font-family:'Share Tech Mono',monospace;
+  font-size:46px;
+  color:var(--gm);
+  text-align:center;
+  align-self:center;
+}
+.s16b-flow .exhibit{height:100%}
+.s16b-flow .exhibit img{max-height:280px}
+/* the printed thermal receipt is the proof — make it the hero of the slide */
+.s16b-proof{
+  display:grid;
+  grid-template-columns:1.05fr 1fr;
+  gap:36px;
+  align-items:center;
+  height:440px;
+}
+.s16b-proof .s16b-hero{height:100%}
+.s16b-proof .s16b-hero img{max-height:430px}
+.s16b-audit-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:24px;
+  height:620px;
+}
+.s16b-audit-pair .exhibit img{max-height:580px}
+.s16b-rewrite .s16b-thesisline{
+  font-family:'Share Tech Mono',monospace;
+  font-size:26px;
+  letter-spacing:1.3px;
+  color:var(--amber);
+  text-shadow:var(--ga);
+  line-height:1.65;
+}
+
+/* ---------- S16c — audit events are modifiable (split off from S16b) ---------- */
+.s16c-events{
+  display:flex;
+  flex-direction:column;
+  gap:24px;
+  max-width:1500px;
+  margin:0 auto;
+  width:100%;
+}
+.s16c-events .s16c-heading{
+  font-family:'Share Tech Mono',monospace;
+  font-size:26px;
+  letter-spacing:1.3px;
+  color:var(--amber);
+  text-shadow:var(--ga);
+  line-height:1.6;
+}
+
+/* ---------- S17 — thesis stays clean; one exhibit beside the declaration ---------- */
+.s17-systemic .s17-exhibit{
+  margin:0 auto;
+  max-width:600px;
+  width:100%;
+}
+.s17-systemic .s17-exhibit img{max-height:360px}
+
+/* ---------- S5 / S20 — single supporting exhibit ---------- */
+.s5-exhibit{max-width:560px;width:100%;margin-top:6px}
+.s5-exhibit img{max-height:360px}
+.s20-exhibit{max-width:520px;width:100%}
+.s20-exhibit img{max-height:260px}
+/* close slide gets denser with the sign-off exhibit present */
+.s20-close{gap:24px}
 
 /* ---------- Operator HUD ---------- */
 #hud{
