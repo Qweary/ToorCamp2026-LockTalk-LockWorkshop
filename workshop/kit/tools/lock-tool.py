@@ -102,6 +102,32 @@ SUDO_BIN = decode_codes.SUDO_BIN
 DUMP_SIZE = build_injected.DUMP_SIZE
 MAX_SLOT = build_injected.MAX_SLOT
 
+# What a canonical attendee LIVE write lands on the lock. The live write flashes
+# a copy of the bundled sample dump with the attendee's code injected, and that
+# sample already carries the three workshop demo codes (baked at slots 19/32/49)
+# plus the 123456 starter code at slot 0. So every attendee ends on the SAME
+# known-good state: the three demo codes + 123456 + their own code. This is the
+# SAMPLE-flash model (deterministic, repeatable across many attendees), not an
+# additive read-modify-write of whatever was previously on the chip. Surfaced to
+# the panel UI via lands_on_lock_summary() so the browser can tell the attendee
+# exactly what ends up on the lock.
+DEMO_CODES = [
+    {"code": "133769", "slot": 19, "role": "Master"},
+    {"code": "420420", "slot": 32, "role": "Elevated"},
+    {"code": "696969", "slot": 49, "role": "Supervisor"},
+]
+STARTER_CODE = {"code": "123456", "slot": 0, "role": "Normal User"}
+
+
+def lands_on_lock_summary(code: str, slot: int, role_display: str) -> str:
+    """One-line, panel-displayable summary of exactly what a canonical LIVE
+    write puts on the lock: the three workshop demo codes + the 123456 starter
+    + the attendee's own code. Pure (no I/O) so the panel and the self-test can
+    both consume it."""
+    demos = ", ".join(d["code"] for d in DEMO_CODES)
+    return (f"Lands on the lock: your code {code} (slot {slot}, {role_display}) "
+            f"+ the 3 demo codes {demos} + the {STARTER_CODE['code']} starter.")
+
 
 # ---------------------------------------------------------------------------
 # READ
@@ -128,6 +154,14 @@ def cmd_read(args) -> int:
         decode_codes.validate_page0(data, dump_path)
         slots = decode_codes.parse_slots(data)
         decode_codes.print_table(slots, show_all=args.all, source_label=source_label)
+        if not args.live:
+            # Depth for advanced users from the safe path: show the exact
+            # minipro read command the --live path WOULD run against the real
+            # chip. (This decode came from a file/sample copy, not hardware.)
+            would_run = " ".join(decode_codes.live_read_command("live-read.bin"))
+            print("  Under the hood, the live read path (--live) would run:")
+            print(f"    $ {would_run}")
+            print()
     finally:
         if cleanup_dir is not None:
             shutil.rmtree(cleanup_dir, ignore_errors=True)
@@ -162,6 +196,27 @@ def resolve_role(role_arg: str | None) -> tuple[int, str]:
         valid = ", ".join(f"0x{v:02X}" for v in sorted(build_injected.VALID_PERMS))
         sys.exit(f"ERROR: permission 0x{perm:02X} not in valid set ({valid}).")
     return perm, PERM_TO_ROLE_NAME.get(perm, f"0x{perm:02X}")
+
+
+def live_write_command(injected_path: str, minipro_bin: str = MINIPRO_BIN) -> list[str]:
+    """The exact minipro argv that the --live write path runs to flash
+    `injected_path` onto the real chip. One definition, shared by the preview
+    surfacing (so advanced users see the under-the-hood command from the safe
+    path) and by _flash_live (the path that actually runs it). No sudo: the
+    installed uaccess udev rule grants the logged-in user direct device access.
+
+    `minipro_bin` defaults to the bare 'minipro' name (so the preview command
+    reads as the canonical PATH invocation); _flash_live passes the RESOLVED
+    path (PATH minipro, else the bundled bin/minipro) so the actual flash works
+    even before install.sh has put minipro on PATH."""
+    # Scope the write (erase+program+verify) to the 'code' main-array memory
+    # region. The AT45DB041E user-id signature-section read/write times out on
+    # T48 firmware 00.1.34 (LIBUSB_ERROR_TIMEOUT; vendor notes "T48 support is
+    # not yet complete"), and the write's verify pass would hit that same
+    # section. The lock's entire user-code table lives in the 'code' main
+    # array, so '-c code' writes exactly the bytes this tool uses and avoids
+    # the flaky signature section — robust and exactly-targeted, not a hack.
+    return [minipro_bin, "-i", "-p", DEVICE_NAME, "-c", "code", "-w", injected_path]
 
 
 def occupied_slot_warning(source_bytes: bytes, slot: int) -> str | None:
@@ -273,19 +328,42 @@ def cmd_write(args) -> int:
             slots, show_all=False,
             source_label=f"your injected dump ({out_path})")
 
-        # Confirm the attendee's slot now reads back what they entered.
+        # Confirm the attendee's slot now reads back what they entered IN THE
+        # COPY. This verifies the encode/decode round trip — it says nothing
+        # about the real chip. The verdict line below makes that unmissable.
         target = next(s for s in slots if s["slot"] == slot)
-        if target["code"] == code and target["active"]:
-            print(f"  CONFIRMED: slot {slot} now decodes to {code} "
-                  f"({role_display}), active. Your value landed.")
-        else:
+        round_trip_ok = (target["code"] == code and target["active"])
+        if not round_trip_ok:
             print(f"  WARNING: slot {slot} re-decode = {target['code']!r}, "
                   f"active={target['active']} — expected {code}. "
                   f"This should not happen; flag a facilitator.")
-        print()
+            print()
 
         if args.live:
+            # The --live path actually writes to hardware; its own confirmation
+            # banner and post-flash "landed on the real chip" verdict are
+            # printed by _flash_live. No PREVIEW banner here.
             _flash_live(out_path, code, slot, role_display, args.yes)
+        else:
+            # PREVIEW / PRACTICE PATH — nothing was written to the lock. Say so
+            # LOUDLY so it can't be skimmed past. The earlier "CONFIRMED … your
+            # value landed" wording was a trap: it read like a hardware success
+            # on a path that never touched the chip.
+            would_run = " ".join(live_write_command(out_path))
+            print("=" * 72)
+            print("  PREVIEW ONLY — nothing was written to the lock.")
+            print("=" * 72)
+            if round_trip_ok:
+                print(f"  Your code {code} decodes correctly in slot {slot} "
+                      f"({role_display}) — but only in this COPY of the dump.")
+            print("  This built a copy of the dump so you can see your code")
+            print("  decode; the real chip is untouched.")
+            print("  To actually flash this onto the lock: re-run with --live")
+            print("  (or use the browser panel's Live-lock mode).")
+            print("  Under the hood, the live path would run:")
+            print(f"    $ {would_run}")
+            print("=" * 72)
+            print()
 
     finally:
         if out_dir_cleanup is not None:
@@ -298,17 +376,20 @@ def _flash_live(injected_path: str, code: str, slot: int,
     """ADVANCED: flash the injected dump to the real chip. Confirmation-gated,
     reusing recover-baseline.py's safety posture (loud-fail on missing
     programmer, explicit gate, fully-qualified device string)."""
-    if shutil.which(MINIPRO_BIN) is None:
+    minipro_bin = decode_codes.resolve_minipro()
+    if minipro_bin is None:
+        # Shared, actionable message (bundled binary + install helper + Mac/Win).
+        # The injected dump is already saved, so note that before the message.
         sys.exit(
-            f"ERROR: --live requires the '{MINIPRO_BIN}' programmer on PATH and "
-            f"a T48 clipped to the chip. '{MINIPRO_BIN}' was not found.\n"
-            f"  Your injected dump was still built and saved at {injected_path}; "
-            f"the SAFE path stops here. install.sh lands minipro at "
-            f"/usr/local/bin/minipro on a station."
+            f"  (Your injected dump was still built and saved at {injected_path}; "
+            f"the SAFE path stops here.)\n"
+            + decode_codes.minipro_not_found_message("live write")
         )
     # No sudo: the uaccess udev rule grants the logged-in user direct device
-    # access, so minipro runs as the unprivileged attendee.
-    cmd = [MINIPRO_BIN, "-i", "-p", DEVICE_NAME, "-w", injected_path]
+    # access, so minipro runs as the unprivileged attendee. Same command the
+    # preview path advertises (live_write_command), now actually run with the
+    # RESOLVED binary (PATH minipro, else the bundled bin/minipro).
+    cmd = live_write_command(injected_path, minipro_bin)
     print("=" * 72)
     print("  LIVE CHIP WRITE — advanced, confirmation gate")
     print("=" * 72)
@@ -343,9 +424,54 @@ def _flash_live(injected_path: str, code: str, slot: int,
             f"and re-run, or run recover-baseline.py to restore the baseline."
         )
     print()
-    print("  LIVE WRITE OK. Reinstall the lock batteries and try your code on")
-    print("  the keypad. If anything is wrong, run recover-baseline.py.")
+    print(f"  LIVE WRITE OK — landed on the REAL chip. {lands_on_lock_summary(code, slot, role_display)}")
+    print("  Reinstall the lock batteries and try your code on the keypad.")
+    print("  If anything is wrong, run recover-baseline.py.")
     print()
+
+
+# ---------------------------------------------------------------------------
+# Panel-callable entry points (programmatic, no input() deadlock)
+# ---------------------------------------------------------------------------
+def _ns(**kw):
+    """Build a SimpleNamespace args object the cmd_* functions accept. Fills the
+    optional fields cmd_read/cmd_write read so the panel doesn't have to."""
+    from types import SimpleNamespace
+    return SimpleNamespace(**kw)
+
+
+def read_live(show_all: bool = True) -> int:
+    """LIVE READ entry point for the browser panel (or any programmatic caller).
+
+    Reads the real chip via minipro and prints the decoded user-code table to
+    stdout. No input() anywhere on this path, so it is safe to call from inside
+    an HTTP handler with stdout captured. Loud-fails (SystemExit) if minipro is
+    missing or the clip did not bite — the caller surfaces that text. Returns 0
+    on success.
+    """
+    return cmd_read(_ns(dump=None, all=show_all, live=True))
+
+
+def flash_attendee_live(code: str, slot: int = 25, role: str | None = None,
+                        out: str | None = None) -> int:
+    """LIVE WRITE entry point for the browser panel — confirmation PRE-GRANTED.
+
+    The panel does its own confirmation in the browser, then calls this. It
+    flashes the canonical SAMPLE-flash state to the real chip: a copy of the
+    bundled sample dump (which already carries the three demo codes at slots
+    19/32/49 + the 123456 starter at slot 0) with the attendee's `code` injected
+    at `slot`/`role`. Every attendee therefore ends on the same deterministic,
+    repeatable known-good state — see lands_on_lock_summary() for the exact
+    contents to display in the UI.
+
+    yes=True is passed through to cmd_write -> _flash_live(assume_yes=True), so
+    NO input() is ever reached: this will not deadlock in an HTTP handler. The
+    loud-fail-on-missing-minipro guard and the recover-baseline.py safety
+    language are preserved unchanged. Returns 0 on a successful flash; raises
+    SystemExit (with operator-facing text) on any failure the caller can show.
+    """
+    return cmd_write(_ns(code=code, slot=slot, role=role, out=out,
+                         baseline_dump=None, live=True, yes=True))
 
 
 # ---------------------------------------------------------------------------
@@ -409,6 +535,26 @@ def run_self_test() -> int:
     check("empty slot 25 emits no warning",
           occupied_slot_warning(baseline, 25) is None,
           f"(got {occupied_slot_warning(baseline, 25)!r})")
+
+    # D2: the live minipro write command surfacing is exact + copy-pasteable.
+    wcmd = live_write_command("/tmp/injected.bin")
+    check("live write command is the minipro -c code -w invocation",
+          wcmd == [MINIPRO_BIN, "-i", "-p", DEVICE_NAME, "-c", "code",
+                   "-w", "/tmp/injected.bin"],
+          f"(got {' '.join(wcmd)!r})")
+    rcmd = decode_codes.live_read_command("/tmp/live-read.bin")
+    check("live read command is the minipro -c code -r invocation",
+          rcmd == [decode_codes.MINIPRO_BIN, "-i", "-p", decode_codes.DEVICE_NAME,
+                   "-c", "code", "-r", "/tmp/live-read.bin"],
+          f"(got {' '.join(rcmd)!r})")
+
+    # D4: the panel's 'what lands on the lock' summary names the attendee code +
+    # all three demo codes + the starter, so the UI can display it verbatim.
+    summary = lands_on_lock_summary("246810", 25, "Normal User")
+    check("lands-on-lock summary names attendee code + 3 demos + starter",
+          "246810" in summary and "133769" in summary and "420420" in summary
+          and "696969" in summary and "123456" in summary,
+          f"(got {summary!r})")
 
     # Roll the bundled-tool self-tests in so a regression in either sibling also
     # fails lock-tool --self-test.

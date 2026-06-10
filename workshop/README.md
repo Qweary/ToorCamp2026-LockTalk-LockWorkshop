@@ -6,30 +6,36 @@ opt-in live path — watch the lock open with a code they just forged.
 
 ## Attendees — one command
 
-From the cloned repo root:
+From the cloned repo **root**:
 
 ```bash
 ./bin/start.sh
 ```
 
-The browser opens to a local READ/WRITE control panel. That's the whole workshop — no
-hardware, no setup, no `sudo`. (Windows: `start.ps1` from the repo root.) The
+The browser opens to a local READ/WRITE control panel in **Practice** mode (a
+calm-green "sample copy, no hardware" banner) — **READ the sample** decodes the user
+codes, **WRITE into a copy (preview)** bakes in your own. That's the whole workshop —
+no hardware, no setup, no `sudo`. (Windows: `start.ps1` from the repo root.) The
 **`PARTICIPANT-HANDOUT.md`** attendee card has the one command, a CLI fallback, and the
 short teaching essence. That handout plus the GUI is everything an attendee needs.
 
 ### CLI fallback (no browser)
 
-The same READ/WRITE run straight from the clone, from any directory, with no `sudo`:
+The same READ/WRITE run **from the repo root**, with no `sudo`:
 
 - `python3 workshop/kit/tools/lock-tool.py read --all` — decode all 50 slots (the
   default source carries three baked-in codes, so you see real codes immediately).
 - `python3 workshop/kit/tools/lock-tool.py write --code 420420 --slot 32 --role elevated`
-  — bake your own code into a copy additively and re-decode it so you watch it land.
+  — bake your own code into a copy and re-decode it so you watch it land. This is a
+  PREVIEW: without `--live` it prints **PREVIEW ONLY — nothing was written to the lock**.
 - `python3 workshop/kit/tools/recover-baseline.py` — restore the code-free baseline.
 
-The live-chip path is the advanced, confirmation-gated opt-in (`lock-tool.py ... --live`,
-`sudo`-free via the bundled udev rule); everything defaults to the safe sample-dump-copy
-path.
+The live-chip path is the advanced, confirmation-gated opt-in — the panel's **Live
+lock** tab (a red "writes the REAL chip" banner, an in-browser flash confirmation), or
+`lock-tool.py ... --live` on the CLI. Every live `minipro` call is `sudo`-free via the
+bundled udev rule, and the kit *bundles* a Linux x86-64 `minipro` binary (with a GPLv3
+attribution notice at `kit/bin/MINIPRO-NOTICE.md`) so a Linux station needs no
+download or compile. Everything defaults to the safe sample-dump-copy path.
 
 ---
 

@@ -100,6 +100,63 @@ MINIPRO_BIN = "minipro"
 SUDO_BIN = "sudo"
 
 
+def find_bundled_minipro() -> str | None:
+    """Locate the kit's BUNDLED minipro binary relative to this script.
+
+    The kit ships a Linux x86-64 minipro at bin/minipro so an attendee never has
+    to download or compile it. PATH `minipro` is preferred (a station that ran
+    install.sh has it at /usr/local/bin/minipro); this is the FALLBACK for the
+    not-yet-installed case — a fresh extraction where the binary is in the tree
+    but not yet on PATH. Resolved relative to this script so it works in every
+    layout this recovery tool runs from (extracted tarball: tools/ sibling to
+    bin/; dev tree: workshop/src/ -> workshop/kit/bin/). Keep this standalone —
+    recover-baseline.py is the load-bearing recovery tool and must not depend on
+    its sibling tools being present.
+
+    Returns an absolute path to an executable bundled binary, or None.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = (
+        os.path.join(here, "..", "bin", "minipro"),
+        os.path.join(here, "..", "kit", "bin", "minipro"),
+        os.path.join(here, "..", "..", "kit", "bin", "minipro"),
+    )
+    for cand in candidates:
+        cand = os.path.abspath(cand)
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
+def resolve_minipro() -> str | None:
+    """Resolve the minipro program to invoke: PATH `minipro` first (post-install
+    station), then the kit's bundled bin/minipro (not-yet-installed). Returns a
+    runnable path/name, or None when neither is available."""
+    on_path = shutil.which(MINIPRO_BIN)
+    if on_path:
+        return on_path
+    return find_bundled_minipro()
+
+
+def minipro_not_found_message() -> str:
+    """Shared, actionable 'minipro not found' message for the recovery path."""
+    return (
+        "ERROR: the recovery write needs the 'minipro' programmer and a T48 "
+        "clipped to the chip, but minipro was not found.\n"
+        "  This kit BUNDLES minipro (Linux x86-64) at the kit's bin/minipro — "
+        "you do not need to download or compile it.\n"
+        "  To set the station up (lands minipro on PATH + the udev rules that "
+        "grant sudo-free device access):\n"
+        "      sudo ./workshop/kit/install.sh      (from the repo root)\n"
+        "      # or from a fresh clone:  sudo ./bootstrap.sh\n"
+        "  The udev rules are the irreducible root step — device access needs "
+        "them even when you run the bundled binary directly.\n"
+        "  Mac/Windows: the bundled binary is a Linux ELF and will not run "
+        "there — macOS 'brew install minipro'; Windows build from "
+        "https://gitlab.com/DavidGriffith/minipro ."
+    )
+
+
 def md5_of_file(path: str) -> str:
     """Stream-hash a file with MD5. Stdlib only; no pip deps."""
     h = hashlib.md5()
@@ -216,21 +273,38 @@ def preflight(baseline_path: str) -> str:
 
 
 def build_minipro_cmd(baseline_path: str, output_path: str | None = None,
-                      mode: str = "write") -> list[str]:
+                      mode: str = "write", minipro_bin: str = MINIPRO_BIN) -> list[str]:
     """Construct the minipro argv. mode ∈ {'write','read'}.
 
     Read mode targets `output_path` (for the post-write verify); write mode
     targets `baseline_path` (the canonical baseline). Both use the standing
     -i flag and the fully-qualified device name (per bench validation).
 
+    `minipro_bin` defaults to the bare 'minipro' name (so the confirmation
+    preview and the --skip-verify manual hint read as the canonical PATH
+    invocation); recover() passes the RESOLVED path (PATH minipro, else the
+    bundled bin/minipro) into the commands it actually runs, so recovery works
+    even before install.sh has put minipro on PATH.
+
     No sudo: the uaccess udev rule grants the logged-in user direct device
     access, so minipro runs as the unprivileged facilitator/attendee.
+
+    Both modes scope minipro to the 'code' main-array memory region with
+    '-c code'. The AT45DB041E user-id signature-section read/write times out
+    on T48 firmware 00.1.34 (LIBUSB_ERROR_TIMEOUT; vendor notes "T48 support
+    is not yet complete"), which would break both the recovery write's verify
+    pass and the post-write read-back. The canonical baseline is exactly the
+    540,672-byte main array (= the 'code' region), and the lock's user-code
+    table lives entirely within it, so '-c code' writes/reads exactly those
+    bytes — robust and exactly-targeted, not a workaround hack. A '-c code -r'
+    read-back returns those same 540,672 bytes, so the downstream MD5 gate in
+    verify_write() stays apples-to-apples against the canonical baseline.
     """
     if mode == "write":
-        return [MINIPRO_BIN, "-i", "-p", DEVICE_NAME, "-w", baseline_path]
+        return [minipro_bin, "-i", "-p", DEVICE_NAME, "-c", "code", "-w", baseline_path]
     if mode == "read":
         assert output_path is not None
-        return [MINIPRO_BIN, "-i", "-p", DEVICE_NAME, "-r", output_path]
+        return [minipro_bin, "-i", "-p", DEVICE_NAME, "-c", "code", "-r", output_path]
     raise ValueError(f"unknown mode {mode!r}")
 
 
@@ -293,7 +367,8 @@ def run_streaming(cmd: list[str], label: str) -> None:
     print(f"--- {label} OK ---")
 
 
-def verify_write(baseline_path: str, baseline_md5: str) -> None:
+def verify_write(baseline_path: str, baseline_md5: str,
+                 minipro_bin: str = MINIPRO_BIN) -> None:
     """Read the chip back to a tempfile and MD5-compare against the baseline.
 
     Adds ~20 seconds. Default-on (recommended) because workshop time pressure
@@ -301,11 +376,15 @@ def verify_write(baseline_path: str, baseline_md5: str) -> None:
     believing the recovery took when in fact the chip is still in a bad state.
     --skip-verify is the opt-out for facilitators who would rather rotate the
     next attendee in and trust minipro's built-in 'Verification OK' line.
+
+    `minipro_bin` is the resolved binary (PATH minipro, else bundled bin/minipro)
+    so the read-back uses the same binary as the write.
     """
     tmpdir = tempfile.mkdtemp(prefix="recover-verify-")
     readback_path = os.path.join(tmpdir, "post-recovery.bin")
     try:
-        cmd = build_minipro_cmd(baseline_path, output_path=readback_path, mode="read")
+        cmd = build_minipro_cmd(baseline_path, output_path=readback_path,
+                                mode="read", minipro_bin=minipro_bin)
         run_streaming(cmd, "POST-WRITE VERIFY READ")
         actual_size = os.path.getsize(readback_path)
         if actual_size != DUMP_SIZE:
@@ -387,6 +466,27 @@ def self_test_resolution() -> int:
                   "(exited but candidate list incomplete)"
         print(f"  [3] no-candidate clean exit:{'PASS' if ok3 else 'FAIL'} {msg}")
         failures += 0 if ok3 else 1
+
+        # Branch 4 — minipro resolution prefers PATH, falls back to the bundled
+        # binary. Drive it hermetically: stub shutil.which to simulate
+        # PATH-present (resolve_minipro returns that) vs PATH-absent (it consults
+        # find_bundled_minipro). We don't assert the bundled binary EXISTS here
+        # (it lives in the kit, not next to workshop/src/), only that the PATH-
+        # absent branch defers to find_bundled_minipro and PATH-present short-
+        # circuits to the PATH hit.
+        import shutil as _sh
+        saved_which = _sh.which
+        try:
+            _sh.which = lambda _name: "/usr/local/bin/minipro"
+            ok4a = (resolve_minipro() == "/usr/local/bin/minipro")
+            _sh.which = lambda _name: None
+            ok4b = (resolve_minipro() == find_bundled_minipro())
+        finally:
+            _sh.which = saved_which
+        ok4 = ok4a and ok4b
+        print(f"  [4] minipro PATH-then-bundled:{'PASS' if ok4 else 'FAIL'} "
+              f"(path-hit={ok4a}, path-absent-defers-to-bundled={ok4b})")
+        failures += 0 if ok4 else 1
     finally:
         CANONICAL_BASELINE_CANDIDATES = saved
 
@@ -488,21 +588,30 @@ def main() -> None:
 
     do_verify = not args.skip_verify
 
+    # Resolve minipro BEFORE the confirmation gate: PATH minipro, else the kit's
+    # bundled bin/minipro (so a not-yet-installed attendee is covered by the
+    # bundled binary). Fail loud + actionable if neither is present rather than
+    # confirming a destructive write we cannot run.
+    minipro_bin = resolve_minipro()
+    if minipro_bin is None:
+        sys.exit(minipro_not_found_message())
+
     if not args.yes:
         confirm_or_exit(baseline_path, baseline_md5, do_verify)
 
     # The write itself. Stream output so the operator sees minipro's progress
-    # lines and the 'Verification OK' line minipro prints internally.
-    write_cmd = build_minipro_cmd(baseline_path, mode="write")
+    # lines and the 'Verification OK' line minipro prints internally. Use the
+    # RESOLVED binary (PATH minipro, else the bundled bin/minipro).
+    write_cmd = build_minipro_cmd(baseline_path, mode="write", minipro_bin=minipro_bin)
     run_streaming(write_cmd, "RECOVERY WRITE")
 
     if do_verify:
-        verify_write(baseline_path, baseline_md5)
+        verify_write(baseline_path, baseline_md5, minipro_bin=minipro_bin)
     else:
         print()
         print("  --skip-verify set; trusting minipro's built-in verification.")
         print(f"  To verify manually:")
-        print(f"    minipro -i -p '{DEVICE_NAME}' -r post-recovery.bin")
+        print(f"    minipro -i -p '{DEVICE_NAME}' -c code -r post-recovery.bin")
         print(f"    md5sum post-recovery.bin  # expect: {baseline_md5}")
 
     print()

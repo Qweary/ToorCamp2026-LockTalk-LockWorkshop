@@ -46,6 +46,11 @@ SRC_LOCK_TOOL             := $(WORKSHOP_SRC)/lock-tool.py
 SRC_LOCK_MENU             := $(WORKSHOP_SRC)/lock-menu.py
 SRC_LOCK_PANEL            := $(WORKSHOP_SRC)/lock-panel.py
 SRC_MINIPRO_BIN           := /usr/local/bin/minipro
+# GPLv3 attribution/NOTICE that travels WITH the bundled minipro binary. The
+# binary is third-party Free Software (GPLv3); this file carries the upstream
+# project + URL, the pinned version/commit, the source-availability offer, and
+# rebuild instructions. It assembles into bin/ next to the binary it covers.
+SRC_MINIPRO_NOTICE        := $(WORKSHOP_SRC)/MINIPRO-NOTICE.md
 # Baseline is committed in-repo at the kit's own dumps/ dir (repo-self-contained).
 # Because source == assemble destination, the copy below is guarded to a no-op
 # when the two paths are the same file. The MD5 gate against
@@ -113,6 +118,11 @@ assemble:
 		echo "    [minipro] Source not found at $(SRC_MINIPRO_BIN); keeping committed in-kit copy"; \
 	fi
 	@chmod 755 "$(KIT_DIR)/bin/minipro"
+	@# minipro GPLv3 attribution/NOTICE — travels alongside the binary in bin/.
+	@# Required for honest GPL redistribution-with-attribution of the bundled
+	@# binary. Copied (not symlinked) so the tarball is self-contained.
+	@cp -f "$(SRC_MINIPRO_NOTICE)"        "$(KIT_DIR)/bin/MINIPRO-NOTICE.md"
+	@chmod 644 "$(KIT_DIR)/bin/MINIPRO-NOTICE.md"
 	@# udev rules — three files shipped by minipro 0.7.4 `make install`
 	@if [ -f "$(SRC_UDEV_RULES_DIR)/60-minipro.rules" ]; then \
 		cp -f "$(SRC_UDEV_RULES_DIR)/60-minipro.rules"          "$(KIT_DIR)/etc/udev/rules.d/60-minipro.rules"; \

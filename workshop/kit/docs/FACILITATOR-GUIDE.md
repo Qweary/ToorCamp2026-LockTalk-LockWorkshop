@@ -9,14 +9,28 @@
 > the cloned repo root (Windows: `start.ps1`) — which opens a local browser
 > READ/WRITE panel, and they follow the `PARTICIPANT-HANDOUT.md` card. That GUI
 > plus the card is the entire attendee experience: no hardware, no setup, no
-> `sudo`. A CLI fallback (`lock-tool.py read --all` / `write ...`, run straight
-> from the clone) is in the handout for anyone who prefers typing.
+> `sudo`. A CLI fallback (`python3 workshop/kit/tools/lock-tool.py read --all` /
+> `write ...`, run from the repo root) is in the handout for anyone who prefers
+> typing.
+>
+> **The panel has two modes, and the UX makes them self-explanatory** so an
+> attendee can run themselves without hand-holding:
+> - **Practice** (default, calm-green "sample copy, no hardware" banner) — *READ
+>   the sample* decodes a copy of the bundled sample dump; *WRITE into a copy
+>   (preview)* bakes the attendee's code into a copy and re-decodes it. Nothing
+>   touches a real lock. The CLI equivalent (`write` without `--live`) prints a
+>   loud **PREVIEW ONLY — nothing was written to the lock** banner.
+> - **Live lock** (red "writes the REAL chip" banner) — *READ the real lock* runs
+>   a real `minipro` read; *FLASH the real lock…* opens an in-browser confirmation
+>   page stating exactly what lands on the chip, then needs a second deliberate
+>   *Yes, flash the real lock* before anything is written. The CLI equivalent is
+>   the `--live` flag.
 >
 > This guide is for the organizer who *is* staffing a session: standing up the
 > station laptops, the hardware counts, the software verification checklist, the
 > recovery workflow, the workshop-distribution dump production step, and
 > troubleshooting. The per-station flow below is the **live-hardware** path; the
-> no-hardware sample-dump path the attendees use needs none of it.
+> no-hardware Practice path the attendees use needs none of it.
 
 ---
 
@@ -60,7 +74,7 @@ The AT45DB041E on each lock board ships under conformal-coating resin that the S
 - [ ] **4× Xgecu T48 programmers** — from the procurement run; serial numbers logged
 - [ ] **4× SOIC-8 clips** — 1.27 mm pitch, 8-pin, with the ZIF ICSP adapter that connects clip-flying-leads to the T48's ICSP header
 - [ ] **1–2× sets of individual long clips + breakout leads** (operator kit, NOT a per-station item) — ad-hoc-only fallback a facilitator may reach for if a specific board geometry defeats the SOIC-8 clip. **Not a standard station method; do not put it in front of attendees as a documented procedure.** The SOIC-8 clip is the per-station method.
-- [ ] **4× Kali laptops** — the cloned repo present; `minipro` 0.7.4 installed via the kit's `sudo ./install.sh` (binary on `$PATH`, udev rules — including `61-minipro-uaccess.rules` — in `/etc/udev/rules.d/`); the live read/write is `sudo`-free via the uaccess rule (no `plugdev` group, no log-out/log-in); the workshop-distribution dump (`intact-lock-AT45DB041E-main-2026-05-20-workshop.bin`) and the injected-codes construction script (`build-injected.py` — see §"Workshop-Distribution Dump Production" below) staged at `workshop/kit/tools/` in the clone
+- [ ] **4× Kali laptops** — the cloned repo present; `minipro` 0.7.4 installed via the kit's `sudo ./workshop/kit/install.sh` (from the repo root). **No download or compile needed: the kit BUNDLES a Linux x86-64 `minipro` 0.7.4 at `workshop/kit/bin/minipro`** (GPLv3 — attribution at `workshop/kit/bin/MINIPRO-NOTICE.md`, upstream `gitlab.com/DavidGriffith/minipro`); `install.sh` drops it on `$PATH` and installs the udev rules — including `61-minipro-uaccess.rules` — in `/etc/udev/rules.d/`. The live tools also fall back to the bundled binary if `PATH` `minipro` is absent. The live read/write is `sudo`-free via the uaccess rule (no `plugdev` group, no log-out/log-in). The workshop-distribution dump (`intact-lock-AT45DB041E-main-2026-05-20-workshop.bin`) and the injected-codes construction script (`build-injected.py` — see §"Workshop-Distribution Dump Production" below) staged at `workshop/kit/tools/` in the clone
 - [ ] **2× spare T48s** — hot-swap if a programmer flakes
 - [ ] **6× spare SOIC-8 clips** — they fail mechanically; 1.5 per station of spare is the right ratio
 - [ ] **8× spare AT45DB041E baseline dumps** — `intact-lock-AT45DB041E-main-2026-05-20.bin` on a USB stick at each station, for recovery writes (§"Recovery — write the baseline back")
@@ -256,7 +270,7 @@ This is where the workshop lives. Each programmer station runs the same flow on 
 
 #### The per-attendee flow at a programmer station (25 min)
 
-This is the **live-hardware** path, for an attendee who wants to do it on a real lock. Read the whole section before the workshop so you can support it. Attendees who just want the lesson run the no-hardware path (`./bin/start.sh`, or the `lock-tool.py read --all` / `write ...` CLI fallback) with no hardware and no help. The steps below describe the manual `minipro` flow on real hardware so you understand what is happening under the hood; in practice the self-service tools wrap the same operations behind a `--live` flag (`lock-tool.py read --all --live`, `lock-tool.py write ... --live`, `recover-baseline.py --live`), which is the path to walk an attendee through. The live read/write is `sudo`-free — the bundled `61-minipro-uaccess.rules` grants the logged-in user direct access to the T48.
+This is the **live-hardware** path, for an attendee who wants to do it on a real lock. Read the whole section before the workshop so you can support it. Attendees who just want the lesson run the no-hardware Practice path (`./bin/start.sh`) with no hardware and no help. The steps below describe the manual `minipro` flow on real hardware so you understand what is happening under the hood; in practice the self-service tools wrap the same operations — the panel's **Live lock** tab, or the CLI `--live` flag (`lock-tool.py read --all --live`, `lock-tool.py write ... --live`), with `recover-baseline.py` as the recovery write. That is the path to walk an attendee through. Every live `minipro` call is `sudo`-free — the bundled `61-minipro-uaccess.rules` grants the logged-in user direct access to the T48.
 
 **Step 1 — Confirm the lock works as it ships (2 min)**
 
@@ -276,16 +290,17 @@ This is the **live-hardware** path, for an attendee who wants to do it on a real
 
 **Step 3 — Read the chip (3 min)**
 
-At the laptop (the raw `minipro` read; `lock-tool.py read --all --live` wraps this same operation). It is `sudo`-free via the uaccess udev rule, and runs from any directory in the clone:
+At the laptop, from the repo root (the raw `minipro` read; `lock-tool.py read --all --live` wraps this same operation). It is `sudo`-free via the uaccess udev rule:
 
 ```bash
-minipro -i -p 'AT45DB041E[Page264]@SOIC8' -r my-dump.bin
+minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -r my-dump.bin
 ```
 
 - The `-i` flag suppresses some interactive prompts; the device name `AT45DB041E[Page264]@SOIC8` is the canonical minipro identifier for the 264-byte-page DataFlash in its SOIC-8 package
+- **`-c code` scopes the read to the chip's `code` main-array region** — the region that holds the entire user-code table. This is deliberate and load-bearing on this workshop's T48 (firmware 00.1.34): a full unscoped read times out on the chip's user-id signature section. See §"`-c code` region scoping (T48 user-id timeout)" in Troubleshooting for the full rationale — the shipped tools all pass `-c code`, so the advertised command equals the run command
 - minipro will print a firmware-version warning. **The warning is non-blocking** — let it scroll past
 - If chip-ID returns `0x0000`, re-seat the clip (§"If the clip won't bite") and run again. Do **not** add `-y` unless you have already re-clipped twice — `-y` bypasses the chip-ID check and can mask a wiring problem
-- A clean read takes ~5 seconds for the main array. Expected output: `Reading Code... OK`, possibly a timeout on `Reading User...` (that's the Security Register, which `-w` does not target; the timeout is benign and the main array is intact)
+- A `-c code` read takes ~5 seconds for the main array. Expected output: `Reading Code... OK`. (A full unscoped read would also try `Reading User...` and time out on that section — that is exactly the section `-c code` skips; see the Troubleshooting note)
 
 ```bash
 ls -l my-dump.bin
@@ -332,7 +347,7 @@ You are going to inject three codes at three privilege levels in three scattered
 
 Walk them through slot 32 specifically: the code `420420` has two zero digits, in the third and sixth positions. Those zeros are encoded as the nibble value `0xB`, not as ASCII `0x30` and not as BCD `0x00`. So code byte 2 for slot 32 = nibbles `B, 4` = `0xB4` (the leading nibble carries the zero digit from position 3). Code byte 3 for slot 32 = nibbles `2, B` = `0x2B` (the trailing nibble carries the zero digit from position 6). This is one of the workshop's payoff moments — show them the bytes, point at where the `0xB` lands in the nibble, and tell them: "If `420420` unlocks the lock, this is the rule for the digit zero. If `420420` is the only one that fails, the rule is something different."
 
-At the laptop (run from any directory in the clone):
+At the laptop, from the repo root:
 
 ```bash
 python3 workshop/kit/tools/build-injected.py my-dump.bin injected.bin
@@ -363,9 +378,10 @@ If any of those bytes is missing, the script did not run cleanly — re-run it a
 The clip is still on the chip. The lock batteries are still out. The T48 is powering the chip through the clip.
 
 ```bash
-minipro -i -p 'AT45DB041E[Page264]@SOIC8' -w injected.bin
+minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -w injected.bin
 ```
 
+- `-c code` scopes the write+verify to the `code` main-array region (same reason as the read; the verify pass would otherwise hit the timing-out user-id section). See the Troubleshooting note
 - This takes about 20 seconds. minipro reports `Verification OK` at the end
 - If it aborts with a firmware-mismatch warning, the warning is non-blocking — the attendee may need to add `-y` to bypass the warning on this build. **Only add `-y` for the firmware warning, never to skip the chip-ID check unless you have already re-clipped**
 - If verification fails, the clip contact dropped mid-write — re-seat and re-run. The write is idempotent against the same `injected.bin`, so a retry is safe
@@ -373,7 +389,7 @@ minipro -i -p 'AT45DB041E[Page264]@SOIC8' -w injected.bin
 Read back to confirm:
 
 ```bash
-minipro -i -p 'AT45DB041E[Page264]@SOIC8' -r post-write.bin
+minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -r post-write.bin
 cmp injected.bin post-write.bin && echo "FULL IMAGE MATCH — write took"
 ```
 
@@ -413,10 +429,10 @@ This is the **defender's takeaway**, not a bug in the attack. Land it that way. 
 If any code fails (Step 7), or if the lock stops responding entirely, write the baseline back to restore the chip:
 
 ```bash
-python3 workshop/kit/tools/recover-baseline.py --live
+python3 workshop/kit/tools/recover-baseline.py
 ```
 
-- `recover-baseline.py --live` flashes the **code-free recovery baseline** (`intact-lock-AT45DB041E-main-2026-05-20.bin`, MD5 `eb6acff32ef13b29ac6ebed10d77316d`) back to the chip — `sudo`-free via the uaccess rule. (The equivalent raw command is `minipro -i -p 'AT45DB041E[Page264]@SOIC8' -w workshop/kit/tools/intact-lock-AT45DB041E-main-2026-05-20.bin`.)
+- `recover-baseline.py` flashes the **code-free recovery baseline** (`intact-lock-AT45DB041E-main-2026-05-20.bin`, MD5 `eb6acff32ef13b29ac6ebed10d77316d`) back to the chip — `sudo`-free via the uaccess rule. It auto-detects the baseline path and is MD5-gated (it refuses to write anything but the canonical baseline). (The equivalent raw command is `minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -w <baseline>.bin`.)
 - The AT45DB041E has no OTP fuses and no auto-lock-on-write behavior; the recovery write is unconditionally available
 - After recovery, slot 0 is `123456` Normal again, the three workshop codes are gone, audit log intact
 
@@ -480,6 +496,14 @@ The clip is electrically wired to something but not to the chip — the bus cloc
 
 The T48 ships with firmware 00.1.34; current minipro expects 01.1.38. The warning is non-blocking — it prints, then the operation completes exit=0. Let it scroll past. Do **not** attempt a T48 firmware update during the workshop; the brick risk is non-trivial and there is no symptom to fix.
 
+### `-c code` region scoping (T48 user-id timeout)
+
+**Every live `minipro` call in this kit is scoped to `-c code`** — both the read (`-c code -r`) and the write+verify (`-c code -w`). This is intentional and load-bearing on this workshop's T48 (firmware 00.1.34, where the vendor notes "T48 support is not yet complete"). Document it here so a future operator on a flaky T48 is not lost.
+
+- **What goes wrong without it.** A *full*, unscoped `minipro … -r` reads the Chip ID and the chip's code/data regions fine, then **times out on the AT45DB041E's user-id signature section** — `IO error: bulk_transfer: LIBUSB_ERROR_TIMEOUT`, exit 1. This is reproducible on this programmer; it is **not** a clip-contact or USB-cable defect, so do not chase it down the clip-bite ladder. A full `-w` hits the same wall on its verify pass.
+- **Why `-c code` is the correct fix, not a workaround.** The lock's **entire user-code table lives in page 0 of the main array — the `code` region** — which reads and writes cleanly every time. Scoping to `-c code` reads/writes exactly the bytes the workshop touches and skips the flaky signature section. It is the exactly-correct region regardless of the firmware quirk; the timeout avoidance is a bonus, not the justification.
+- **Consequences for the workshop.** A `-c code` read returns the same 540,672-byte main array (so MD5/size gates and `cmp` stay apples-to-apples against the canonical baseline). The shipped tools (`lock-tool.py --live`, `recover-baseline.py`) all pass `-c code` internally, so **the advertised "under the hood" command equals the command the tool actually runs.** If you ever type a raw `minipro` command by hand at the bench, include `-c code` or you will hit the user-id timeout.
+
 ### Write failed verification
 
 The clip slipped mid-write. Re-seat the clip, re-run the write command. The write is idempotent against the same `injected.bin` file, so re-writing produces the same end state regardless of where the previous attempt stopped.
@@ -538,19 +562,19 @@ Refuse politely. Glasses and ear protection are at the entry to the station for 
 
 ## Organizer Pocket Reference
 
-Tear this out and put it in your back pocket. Everything you need to drive a programmer station in two columns. All live commands are `sudo`-free (the uaccess udev rule) and run from any directory in the clone.
+Tear this out and put it in your back pocket. Everything you need to drive a programmer station in two columns. All live commands are `sudo`-free (the uaccess udev rule) and run from the repo root. Every raw `minipro` call is scoped to `-c code` (the `code` main-array region — avoids the T48 firmware-00.1.34 user-id-section timeout; see the Troubleshooting note).
 
 ### The live commands (raw minipro under the hood; `lock-tool.py ... --live` wraps them)
 
 ```
-Read:    minipro -i -p 'AT45DB041E[Page264]@SOIC8' -r my-dump.bin
+Read:    minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -r my-dump.bin
 Build:   python3 workshop/kit/tools/build-injected.py my-dump.bin injected.bin
-Write:   minipro -i -p 'AT45DB041E[Page264]@SOIC8' -w injected.bin
-Verify:  minipro -i -p 'AT45DB041E[Page264]@SOIC8' -r post-write.bin
+Write:   minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -w injected.bin
+Verify:  minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -r post-write.bin
          cmp injected.bin post-write.bin
-Recover: python3 workshop/kit/tools/recover-baseline.py --live
-         (raw: minipro -i -p 'AT45DB041E[Page264]@SOIC8' -w \
-            workshop/kit/tools/intact-lock-AT45DB041E-main-2026-05-20.bin)
+Recover: python3 workshop/kit/tools/recover-baseline.py   (auto-detect baseline, MD5-gated)
+         (raw: minipro -i -p 'AT45DB041E[Page264]@SOIC8' -c code -w \
+            <canonical-baseline>.bin)
 ```
 
 ### The two bundled dumps

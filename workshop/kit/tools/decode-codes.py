@@ -94,6 +94,81 @@ MINIPRO_BIN = "minipro"
 SUDO_BIN = "sudo"
 
 
+def find_bundled_minipro() -> str | None:
+    """Locate the kit's BUNDLED minipro binary relative to this script.
+
+    The kit ships a Linux x86-64 minipro at bin/minipro so an attendee never has
+    to download or compile it. PATH `minipro` is preferred (a station that ran
+    install.sh has it at /usr/local/bin/minipro); this is the FALLBACK for the
+    not-yet-installed case — a fresh Download-ZIP extraction where the binary is
+    present in the tree but not yet on PATH.
+
+    Resolved relative to this script so it works in every layout the tools run
+    from. Checked, in order:
+      - ../bin/minipro          (extracted tarball: tools/ sibling to bin/)
+      - ../kit/bin/minipro      (dev tree: workshop/src/ -> workshop/kit/bin/)
+      - ../../kit/bin/minipro   (defensive extra hop)
+
+    Returns an absolute path to an executable bundled binary, or None.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    candidates = (
+        os.path.join(here, "..", "bin", "minipro"),
+        os.path.join(here, "..", "kit", "bin", "minipro"),
+        os.path.join(here, "..", "..", "kit", "bin", "minipro"),
+    )
+    for cand in candidates:
+        cand = os.path.abspath(cand)
+        if os.path.isfile(cand) and os.access(cand, os.X_OK):
+            return cand
+    return None
+
+
+def resolve_minipro() -> str | None:
+    """Resolve the minipro program to invoke.
+
+    PATH `minipro` first (the post-install station case), then the kit's bundled
+    bin/minipro (the not-yet-installed case). Returns a runnable path/name, or
+    None when neither is available. One definition, shared by every live path in
+    the kit (decode/read here, lock-tool's live write, recover-baseline's flash)
+    so the resolution rule is identical everywhere.
+    """
+    on_path = shutil.which(MINIPRO_BIN)
+    if on_path:
+        return on_path
+    return find_bundled_minipro()
+
+
+def minipro_not_found_message(context: str) -> str:
+    """The shared, actionable 'minipro not found' message. `context` names the
+    operation (e.g. 'live read', 'live write') for the first line.
+
+    Pointers, in the order an attendee should try them:
+      1. Use the bundled binary in place (no download, no compile) — but device
+         access still needs the udev rules, which the install helper lands.
+      2. Run the bundled install helper to land minipro on PATH + the udev rules.
+      3. Mac/Windows one-liners (the bundled binary is a Linux ELF and won't run
+         there).
+    """
+    return (
+        f"ERROR: --live ({context}) needs the 'minipro' programmer and a T48 "
+        f"clipped to the chip, but minipro was not found.\n"
+        f"  This kit BUNDLES minipro (Linux x86-64) at the kit's bin/minipro — "
+        f"you do not need to download or compile it.\n"
+        f"  To set the station up (lands minipro on PATH + the udev rules that "
+        f"grant sudo-free device access):\n"
+        f"      sudo ./workshop/kit/install.sh      (from the repo root)\n"
+        f"      # or from a fresh clone:  sudo ./bootstrap.sh\n"
+        f"  The udev rules are the irreducible root step — device access needs "
+        f"them even when you run the bundled binary directly.\n"
+        f"  Mac/Windows: the bundled binary is a Linux ELF and will not run "
+        f"there — macOS 'brew install minipro'; Windows build from "
+        f"https://gitlab.com/DavidGriffith/minipro .\n"
+        f"  For the SAFE no-hardware path, drop --live and the tool works on the "
+        f"bundled sample dump with nothing but python3."
+    )
+
+
 def find_sample_dump() -> str | None:
     """Locate the bundled sample dump relative to this script.
 
@@ -266,6 +341,27 @@ def print_table(slots: list[dict], show_all: bool, source_label: str) -> None:
     print()
 
 
+def live_read_command(out_path: str, minipro_bin: str = MINIPRO_BIN) -> list[str]:
+    """The exact minipro argv that the --live read path runs to dump the real
+    chip into `out_path`. One definition, shared by read_live_chip (which runs
+    it) and by the non-live read surfacing (which advertises it to advanced
+    users from the safe path). No sudo: the uaccess udev rule grants the
+    logged-in user direct device access.
+
+    `minipro_bin` defaults to the bare 'minipro' name (so the command surfaced
+    to advanced users on the SAFE path reads as the canonical PATH invocation);
+    read_live_chip passes the RESOLVED path (PATH minipro, else the bundled
+    bin/minipro) so the actual run works even before install.sh has put minipro
+    on PATH."""
+    # Scope the read to the 'code' main-array memory region. The AT45DB041E
+    # user-id signature-section read times out on T48 firmware 00.1.34
+    # (LIBUSB_ERROR_TIMEOUT; vendor notes "T48 support is not yet complete").
+    # The lock's entire user-code table lives in the 'code' main array, so
+    # '-c code' reads exactly the bytes this tool uses and avoids the flaky
+    # signature section — robust and exactly-targeted, not a workaround hack.
+    return [minipro_bin, "-i", "-p", DEVICE_NAME, "-c", "code", "-r", out_path]
+
+
 def read_live_chip() -> str:
     """Read the real chip via minipro into a tempfile; return the path.
 
@@ -273,20 +369,16 @@ def read_live_chip() -> str:
     posture: fully-qualified device name + standing -i flag. Fails LOUD if the
     programmer binary is missing rather than silently degrading.
     """
-    if shutil.which(MINIPRO_BIN) is None:
-        sys.exit(
-            f"ERROR: --live requires the '{MINIPRO_BIN}' programmer on PATH and "
-            f"a T48 clipped to the chip. '{MINIPRO_BIN}' was not found.\n"
-            f"  This is the ADVANCED live-chip path. For the safe no-hardware "
-            f"path, drop --live and the tool decodes the bundled sample dump.\n"
-            f"  On a station, minipro installs to /usr/local/bin/minipro via "
-            f"install.sh."
-        )
+    minipro_bin = resolve_minipro()
+    if minipro_bin is None:
+        sys.exit(minipro_not_found_message("live read"))
     tmpdir = tempfile.mkdtemp(prefix="decode-live-")
     out_path = os.path.join(tmpdir, "live-read.bin")
     # No sudo: the uaccess udev rule grants the logged-in user direct device
-    # access, so minipro runs as the unprivileged attendee.
-    cmd = [MINIPRO_BIN, "-i", "-p", DEVICE_NAME, "-r", out_path]
+    # access, so minipro runs as the unprivileged attendee. Use the RESOLVED
+    # binary (PATH minipro, else the bundled bin/minipro) so the run works even
+    # before install.sh has landed minipro on PATH.
+    cmd = live_read_command(out_path, minipro_bin)
     print()
     print("--- LIVE CHIP READ (advanced) ---")
     print(f"  $ {' '.join(cmd)}")

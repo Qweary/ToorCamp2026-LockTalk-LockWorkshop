@@ -6,31 +6,35 @@
 
 ## One command
 
-From the cloned repo root:
+From the cloned repo **root**:
 
 ```bash
 ./bin/start.sh
 ```
 
-The browser opens to a local control panel. Click **READ** to decode the lock's 50
-code slots; type a code and click **WRITE** to inject your own. That's it — no
-hardware, no setup, no `sudo`. (Windows: run `start.ps1` from the repo root instead.)
+The browser opens to a local control panel in **Practice** mode (a calm-green
+"sample copy, no hardware" banner). Click **READ the sample** to decode the lock's
+50 code slots; type a code and click **WRITE into a copy (preview)** to bake in your
+own. That's it — no hardware, no setup, no `sudo`. (Windows: run `start.ps1` from
+the repo root instead.)
 
 Everything runs locally against a bundled sample dump. Nothing touches a real chip
-until you opt into the live path at the very end of this card.
+until you switch the panel to **Live lock** mode (or pass `--live` on the CLI) — the
+opt-in live path at the very end of this card.
 
 ---
 
 ## CLI fallback (no browser needed)
 
-If you would rather type, three lines do the whole workshop — straight from the
-clone, from any directory, with no `sudo`:
+If you would rather type, three lines do the whole workshop. Run them **from the
+repo root**, with no `sudo`:
 
 ```bash
 # READ — decode all 50 slots (shows the three baked-in codes)
 python3 workshop/kit/tools/lock-tool.py read --all
 
-# WRITE — bake your own code into a copy and watch it land
+# WRITE — bake your own code into a copy and watch it land (a PREVIEW — the
+#         real chip is never touched without --live)
 python3 workshop/kit/tools/lock-tool.py write --code 420420 --slot 32 --role elevated
 
 # RECOVER — restore the code-free baseline if you want a clean slate
@@ -40,7 +44,10 @@ python3 workshop/kit/tools/recover-baseline.py
 `--code` is any six digits (zeros allowed — the tool applies the `0xB`-for-zero rule
 for you), `--slot` is `0`–`49`, `--role` is `master`, `elevated`, `supervisor`, or
 `normal`. The default `read --all` source already carries three codes (below), so you
-see real codes the moment you read — nothing is faked.
+see real codes the moment you read — nothing is faked. A `write` without `--live`
+prints a loud **PREVIEW ONLY — nothing was written to the lock** banner: it bakes
+your code into a *copy* and re-decodes it so you watch your value land, but the real
+chip is untouched.
 
 ---
 
@@ -81,20 +88,48 @@ re-mastering anomaly, and the audit-log structure are in the **decode reference*
 
 ## Advanced: the live chip (opt-in)
 
-You do **not** need this to finish the workshop — the GUI and the CLI fallback teach
-the whole decode/inject lesson on the sample dump. The live path is for anyone who
-wants to do it on real hardware, and it is the only place hardware is touched. Ask an
-organizer to walk you through it; the short version:
+You do **not** need this to finish the workshop — the panel's Practice mode and the
+CLI fallback teach the whole decode/inject lesson on the sample dump. The live path
+is for anyone who wants to do it on real hardware, and it is the only place hardware
+is touched. Ask an organizer to walk you through it; the short version:
 
-- The same READ and WRITE gain a `--live` flag that talks to a real AT45DB041E via a
-  T48 programmer and SOIC-8 clip. The clip-read is `sudo`-free (the bundled udev rule
-  grants your session access directly). The `--live` write is confirmation-gated — the
-  tool prints exactly what it will do and waits for you to type `yes`.
+**In the browser:** click the **Live lock** tab. The banner turns red — *"LIVE LOCK
+— writes the REAL chip."* **READ the real lock** runs a real read; **FLASH the real
+lock…** takes you to a confirmation page that shows exactly what lands on the lock
+(your code, plus the 3 demo codes and the `123456` starter) and reminds you the clip
+must be seated and the batteries OUT. Only after a second deliberate **Yes, flash the
+real lock** does anything get written. Cancel takes you back.
+
+**On the CLI:** the same READ and WRITE gain a `--live` flag that talks to a real
+AT45DB041E via a T48 programmer and SOIC-8 clip — `python3 workshop/kit/tools/lock-tool.py
+read --all --live` and `… write --code … --slot … --role … --live`. Every live
+`minipro` call is `sudo`-free (the bundled udev rule grants your session access
+directly). The `--live` write is confirmation-gated: it prints exactly what it will
+do and waits for you to type `yes`, then reports **LIVE WRITE OK — landed on the REAL
+chip**.
+
+What a live write lands: a copy of the sample dump with your code injected, so every
+attendee ends on the same known-good state — your code **plus** the 3 demo codes
+(`133769`, `420420`, `696969`) at slots 19/32/49 and the `123456` starter at slot 0.
+
 - After writing, reinstall the lock's batteries and punch each code on the keypad:
   `133769` (Master), `420420` (Elevated — the `0xB`-for-zero proof), `696969`
   (Supervisor), and `123456` (the untouched factory slot) all unlock.
-- If anything goes sideways, `recover-baseline.py --live` flashes the code-free
-  baseline back. The AT45DB041E has no OTP fuses; recovery is always available.
+- If anything goes sideways, `recover-baseline.py` flashes the code-free baseline
+  back. The AT45DB041E has no OTP fuses; recovery is always available.
+
+**Under the hood** (for the curious — the tools print these so the advertised command
+equals the run command): the live read is `minipro -i -p AT45DB041E[Page264]@SOIC8 -c
+code -r <file>` and the live write is `minipro -i -p AT45DB041E[Page264]@SOIC8 -c code
+-w <file>`. The `-c code` scopes the operation to the chip's main-array `code` region,
+where the entire user-code table lives.
+
+**No minipro installed?** This kit *bundles* a Linux x86-64 `minipro` binary, so a
+Kali/Linux laptop needs no download or compile. `sudo ./workshop/kit/install.sh`
+lands it on `PATH` plus the udev rules; the live tools also fall back to the bundled
+binary on their own. Mac: `brew install minipro`. Windows: build from the upstream
+project, `gitlab.com/DavidGriffith/minipro`. (The bundled binary travels with a GPLv3
+attribution notice at `kit/bin/MINIPRO-NOTICE.md`.)
 
 ---
 

@@ -11,12 +11,13 @@ Every file shipped in `facilitator-kit-toorcamp-2026.tar.gz`. `selftest.sh` re-M
 
 | Path | Size (bytes) | MD5 | Role | Provenance |
 |---|---:|---|---|---|
-| `Makefile` | 11346 | `1b607afc187202a8b02e3b9212d5af21` | build | reproducible build entry point |
+| `Makefile` | 12064 | `b9a06b93e61f395e9f78595b4085fb91` | build | reproducible build entry point |
 | `README.md` | 8455 | `12d1660bb56bc10a9be5c103932fd348` | doc | kit overview + facilitator stand-up instructions |
-| `bin/minipro` | 455856 | `6b4a79297372baa92ddf495090f74f7d` | binary | minipro 0.7.4 (DavidGriffith fd6b56af) — Linux-AMD64 ELF |
+| `bin/MINIPRO-NOTICE.md` | 3336 | `09c2ac6ccbecd1d4143db2dea197e7e6` | license | GPLv3 attribution + source-availability notice for the bundled minipro binary (DavidGriffith 0.7.4 / fd6b56af) |
+| `bin/minipro` | 455856 | `6b4a79297372baa92ddf495090f74f7d` | binary | minipro 0.7.4 (DavidGriffith fd6b56af) — Linux-AMD64 ELF, GPLv3 (see bin/MINIPRO-NOTICE.md) |
 | `docs/DATAFLASH-DECODE-REFERENCE.md` | 20579 | `83dfd89650e7d02b73cf68dfd9e2fc6b` | doc | AT45DB041E dump format reference (page-0 layout, BCD-B encoding) |
-| `docs/FACILITATOR-GUIDE.md` | 42265 | `a19aac13aeae60e49dbf495e63c3e514` | doc | facilitator-facing workshop runbook (47KB) |
-| `docs/PARTICIPANT-HANDOUT.md` | 4278 | `77e919337eca1e3c40afe06206ce7dba` | doc | attendee-facing 1-page workshop handout |
+| `docs/FACILITATOR-GUIDE.md` | 46185 | `cc60476675efd5675539c0d9152965f1` | doc | facilitator-facing workshop runbook (47KB) |
+| `docs/PARTICIPANT-HANDOUT.md` | 6537 | `a603dba27844feea273eb7121e5c48ee` | doc | attendee-facing 1-page workshop handout |
 | `dumps/intact-lock-AT45DB041E-main-2026-05-20.bin` | 540672 | `eb6acff32ef13b29ac6ebed10d77316d` | dump | canonical intact-lock baseline (540,672 bytes, sensitive, workshop-internal) |
 | `dumps/workshop-sample-3codes-AT45DB041E-2026-05-20.bin` | 540672 | `741dcc79d9975b956d9e1c0a14de0e2b` | dump | teaching sample (540,672 bytes, sensitive, workshop-internal): canonical baseline + the 3 default workshop codes injected additively at slots 19/32/49; default READ source for the tools |
 | `etc/udev/rules.d/60-minipro.rules` | 1118 | `0a709dddd9992911d0b3c4767cbcd1c5` | udev | minipro USB-device tagging rule (TL866A/CS, TL866II+, T48, T56, T76) |
@@ -25,11 +26,11 @@ Every file shipped in `facilitator-kit-toorcamp-2026.tar.gz`. `selftest.sh` re-M
 | `install.sh` | 14883 | `204f3fe63681a76272b6d878e0767dd5` | installer | one-command Kali stand-up entry point |
 | `selftest.sh` | 8927 | `94f39fbc2ff8529437a509a2523896ad` | validator | hardware-free kit-integrity check |
 | `tools/build-injected.py` | 8683 | `7b93fe3986fbbf05ff5f7104c821b342` | tool | builds injected.bin from baseline + canonical 3-slot patch |
-| `tools/decode-codes.py` | 18427 | `b6b33026f8e6a82de1841bf0ba83354d` | tool | reads + decodes the page-0 user-code table (the READ action; renders empty slots) |
+| `tools/decode-codes.py` | 23035 | `4dbe45962048609515c65c37c501ca20` | tool | reads + decodes the page-0 user-code table (the READ action; renders empty slots) |
 | `tools/lock-menu.py` | 5898 | `a73a4d107d7826852d5b6d61bd9add34` | tool | plain-text menu front-end wrapping lock-tool.py (thin convenience layer) |
-| `tools/lock-panel.py` | 16291 | `b7a3d162cba4fd48e4794b9b327ed02f` | tool | localhost browser control panel: READ button + custom-value field + WRITE button |
-| `tools/lock-tool.py` | 20948 | `6244b0468987f02a4eede1e3dc960501` | tool | unified read/write CLI; bakes a custom code into a copy + re-decodes (W2/W3 bedrock) |
-| `tools/recover-baseline.py` | 24055 | `d1aaa0568a6db8d27714928aba916d9d` | tool | defensive wrapper around minipro -w; recovers a botched write |
+| `tools/lock-panel.py` | 32943 | `5dbe5514210af8565b75b45342c032a0` | tool | localhost browser control panel: READ button + custom-value field + WRITE button |
+| `tools/lock-tool.py` | 29368 | `3f318c2ac878214facc1ac2d3066187e` | tool | unified read/write CLI; bakes a custom code into a copy + re-decodes (W2/W3 bedrock) |
+| `tools/recover-baseline.py` | 29808 | `fed4aab19a3b32bc197d2c8ea204375d` | tool | defensive wrapper around minipro -w; recovers a botched write |
 
 ## Sensitive content
 

@@ -31,7 +31,8 @@ role_for() {
         install.sh)                                   echo "installer|one-command Kali stand-up entry point" ;;
         selftest.sh)                                  echo "validator|hardware-free kit-integrity check" ;;
         MANIFEST.md)                                  echo "manifest|this file — top-level kit manifest" ;;
-        bin/minipro)                                  echo "binary|minipro 0.7.4 (DavidGriffith fd6b56af) — Linux-AMD64 ELF" ;;
+        bin/minipro)                                  echo "binary|minipro 0.7.4 (DavidGriffith fd6b56af) — Linux-AMD64 ELF, GPLv3 (see bin/MINIPRO-NOTICE.md)" ;;
+        bin/MINIPRO-NOTICE.md)                        echo "license|GPLv3 attribution + source-availability notice for the bundled minipro binary (DavidGriffith 0.7.4 / fd6b56af)" ;;
         etc/udev/rules.d/60-minipro.rules)            echo "udev|minipro USB-device tagging rule (TL866A/CS, TL866II+, T48, T56, T76)" ;;
         etc/udev/rules.d/61-minipro-plugdev.rules)    echo "udev|grants MODE=660 + GROUP=plugdev on tagged minipro devices" ;;
         etc/udev/rules.d/61-minipro-uaccess.rules)    echo "udev|tags minipro devices with TAG+=uaccess (logind seat access)" ;;
