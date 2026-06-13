@@ -26,20 +26,23 @@ opt-in live path at the very end of this card.
 
 ## CLI fallback (no browser needed)
 
-If you would rather type, three lines do the whole workshop. Run them **from the
-repo root**, with no `sudo`:
+If you would rather type, three lines do the whole workshop. They go through
+`./bin/lock` — a tiny launcher that **runs from any directory** (it finds the
+tools relative to itself, so you never have to `cd` anywhere first). No `sudo`:
 
 ```bash
 # READ — decode all 50 slots (shows the three baked-in codes)
-python3 workshop/kit/tools/lock-tool.py read --all
+./bin/lock read --all
 
 # WRITE — bake your own code into a copy and watch it land (a PREVIEW — the
 #         real chip is never touched without --live)
-python3 workshop/kit/tools/lock-tool.py write --code 420420 --slot 32 --role elevated
+./bin/lock write --code 420420 --slot 32 --role elevated
 
 # RECOVER — restore the code-free baseline if you want a clean slate
-python3 workshop/kit/tools/recover-baseline.py
+./bin/lock recover
 ```
+
+(Windows: use `.\lock.ps1 read --all`, `.\lock.ps1 write …`, `.\lock.ps1 recover`.)
 
 `--code` is any six digits (zeros allowed — the tool applies the `0xB`-for-zero rule
 for you), `--slot` is `0`–`49`, `--role` is `master`, `elevated`, `supervisor`, or
@@ -101,12 +104,11 @@ must be seated and the batteries OUT. Only after a second deliberate **Yes, flas
 real lock** does anything get written. Cancel takes you back.
 
 **On the CLI:** the same READ and WRITE gain a `--live` flag that talks to a real
-AT45DB041E via a T48 programmer and SOIC-8 clip — `python3 workshop/kit/tools/lock-tool.py
-read --all --live` and `… write --code … --slot … --role … --live`. Every live
-`minipro` call is `sudo`-free (the bundled udev rule grants your session access
-directly). The `--live` write is confirmation-gated: it prints exactly what it will
-do and waits for you to type `yes`, then reports **LIVE WRITE OK — landed on the REAL
-chip**.
+AT45DB041E via a T48 programmer and SOIC-8 clip — `./bin/lock read --all --live` and
+`./bin/lock write --code … --slot … --role … --live`. Every live `minipro` call is
+`sudo`-free (the bundled udev rule grants your session access directly). The `--live`
+write is confirmation-gated: it prints exactly what it will do and waits for you to
+type `yes`, then reports **LIVE WRITE OK — landed on the REAL chip**.
 
 What a live write lands: a copy of the sample dump with your code injected, so every
 attendee ends on the same known-good state — your code **plus** the 3 demo codes
@@ -126,22 +128,35 @@ where the entire user-code table lives.
 
 **Working with your own dump.** Want to read a *different* lock, see what's on it,
 add codes, and write it back? The two raw `minipro` lines above bracket a four-step
-loop. Run the `python3` lines **from the repo root**:
+loop. The `./bin/lock` lines run from any directory:
+
+> **`minipro` not on PATH?** If a raw `minipro …` line below says *command not found*,
+> either run the kit installer once (`sudo ./workshop/kit/install.sh`, which lands
+> `minipro` on PATH), **or** use the bundled binary directly by sourcing its env
+> snippet first — one line, no install:
+>
+> ```bash
+> source workshop/kit/bin/minipro-env.sh && workshop/kit/bin/minipro -i -p AT45DB041E[Page264]@SOIC8 -c code -r mydump.bin
+> ```
+>
+> (In an *installed* `~/workshop/` tree the equivalents are `source bin/minipro-env.sh`
+> and `bin/minipro …`. Sourcing the snippet points minipro at the kit's bundled
+> device database so chip profiling works on a clean machine.)
 
 ```bash
 # 1. READ your chip to a file (raw minipro, -c code scoping required on this T48)
 minipro -i -p AT45DB041E[Page264]@SOIC8 -c code -r mydump.bin
 
 # 2. DECODE what's on it — every slot, code + role
-python3 workshop/kit/tools/lock-tool.py read --dump mydump.bin --all
+./bin/lock read --dump mydump.bin --all
 
 # 3a. ADD the canonical 3 codes the EASY way — additive, preserves existing codes
-python3 workshop/kit/tools/build-injected.py mydump.bin myinjected.bin
+./bin/lock build mydump.bin myinjected.bin
 
 # 4. WRITE it back, then re-read + decode to verify it landed
 minipro -i -p AT45DB041E[Page264]@SOIC8 -c code -w myinjected.bin
 minipro -i -p AT45DB041E[Page264]@SOIC8 -c code -r verify.bin
-python3 workshop/kit/tools/lock-tool.py read --dump verify.bin --all
+./bin/lock read --dump verify.bin --all
 ```
 
 `build-injected.py` reads a 540,672-byte dump and writes a copy with the canonical
@@ -157,11 +172,12 @@ table are all in the **decode reference** (`kit/docs/DATAFLASH-DECODE-REFERENCE.
 — don't guess the offsets, read them there. Then write the file back with step 4.
 
 **No minipro installed?** This kit *bundles* a Linux x86-64 `minipro` binary, so a
-Kali/Linux laptop needs no download or compile. `sudo ./workshop/kit/install.sh`
-lands it on `PATH` plus the udev rules; the live tools also fall back to the bundled
-binary on their own. Mac: `brew install minipro`. Windows: build from the upstream
-project, `gitlab.com/DavidGriffith/minipro`. (The bundled binary travels with a GPLv3
-attribution notice at `kit/bin/MINIPRO-NOTICE.md`.)
+Kali/Linux laptop needs no download or compile — see the **`minipro` not on PATH?**
+box above for the two ways in (run `sudo ./workshop/kit/install.sh`, or source
+`workshop/kit/bin/minipro-env.sh` and call the bundled binary directly). The live
+tools also fall back to the bundled binary on their own. Mac: `brew install minipro`.
+Windows: build from the upstream project, `gitlab.com/DavidGriffith/minipro`. (The
+bundled binary travels with a GPLv3 attribution notice at `kit/bin/MINIPRO-NOTICE.md`.)
 
 ---
 

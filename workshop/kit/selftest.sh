@@ -282,6 +282,43 @@ else
 fi
 
 # -----------------------------------------------------------------------------
+# Phase 4: bundled launcher + handout hygiene.
+#
+# The kit ships the cwd-robust launchers (bin/lock + bin/start.sh) so ONE handout
+# is correct in every layout. Two cheap guards:
+#   (a) bin/lock present + executable — it is the CLI entry the handout points at.
+#   (b) the bundled handout carries NO stale 'workshop/kit/tools/' literal — that
+#       brittle bare path only resolved from the cloned repo root and is the exact
+#       defect the launcher replaced. A regression that reintroduces it (e.g. an
+#       un-migrated copy) fails the kit gate here.
+# -----------------------------------------------------------------------------
+echo
+echo "==> Phase 4: bundled launcher + handout hygiene"
+echo
+
+LOCK_LAUNCHER="${KIT_DIR}/bin/lock"
+if [ -x "$LOCK_LAUNCHER" ]; then
+    echo "    PASS: bin/lock present + executable"
+else
+    note_fail "bin/lock missing or not executable"
+    echo "    FAIL: bin/lock not present/executable at ${LOCK_LAUNCHER}"
+fi
+
+HANDOUT="${KIT_DIR}/docs/PARTICIPANT-HANDOUT.md"
+if [ ! -f "$HANDOUT" ]; then
+    note_fail "docs/PARTICIPANT-HANDOUT.md missing"
+    echo "    FAIL: docs/PARTICIPANT-HANDOUT.md not present"
+elif grep -q 'workshop/kit/tools/' "$HANDOUT"; then
+    note_fail "handout still contains stale 'workshop/kit/tools/' literal"
+    echo "    FAIL: docs/PARTICIPANT-HANDOUT.md still references the brittle"
+    echo "          'workshop/kit/tools/...' path (only valid from the repo root)."
+    echo "          Migrate the command to './bin/lock …' and re-assemble."
+    grep -n 'workshop/kit/tools/' "$HANDOUT" | sed 's/^/    /'
+else
+    echo "    PASS: handout carries no stale 'workshop/kit/tools/' literal"
+fi
+
+# -----------------------------------------------------------------------------
 # Final report
 # -----------------------------------------------------------------------------
 echo

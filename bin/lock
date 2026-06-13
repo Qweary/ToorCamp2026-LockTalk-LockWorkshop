@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+# lock — the attendee's one CLI command. Run it from ANYWHERE and it drives the
+# whole no-hardware (and opt-in live) workshop flow. That's it.
+#
+#     ./bin/lock read --all
+#     ./bin/lock write --code 420420 --slot 32 --role elevated
+#     ./bin/lock recover
+#     ./bin/lock build mydump.bin myinjected.bin
+#
+# What it does: a thin, cwd-robust dispatcher over the three bundled Python
+# tools. The browser launcher (start.sh) already resolves its repo root from its
+# own location so it works from any directory; this gives the CLI fallback the
+# SAME property, so the handout's one set of commands is correct everywhere.
+#
+# PATH-RELATIVE BY DESIGN: the install root is resolved from THIS script's own
+# location (lock lives in bin/, so the root is one level up). Nothing here
+# hardcodes a home directory — invoke it as ./bin/lock, /abs/path/bin/lock, or
+# `bash bin/lock` from /tmp, ~, or anywhere and it works unchanged.
+
+set -uo pipefail
+
+# ---------------------------------------------------------------------------
+# Resolve the install root from this script's own location. lock lives in bin/,
+# so the root is its parent. Works whether invoked as ./bin/lock,
+# /abs/path/bin/lock, or `bash bin/lock`.
+# ---------------------------------------------------------------------------
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# ---------------------------------------------------------------------------
+# Dual-layout tools-dir probe. The launcher ships into THREE distribution
+# layouts and the tools live in a DIFFERENT place in two of them:
+#
+#   1. Cloned repo            -> <root>/workshop/kit/tools   (root = repo root)
+#   2. Extracted kit tarball  -> <root>/tools               (root = kit dir; bin/
+#                                is a sibling of tools/)
+#   3. Installed ~/workshop/  -> <root>/tools               (root = ~/workshop;
+#                                bin/ is a sibling of tools/)
+#
+# So probe both candidates relative to the resolved root and use whichever has
+# lock-tool.py. The repo layout is checked first (it is the most specific path);
+# the kit/installed sibling layout is the fallback.
+# ---------------------------------------------------------------------------
+TOOLS_DIR=""
+for cand in "${ROOT}/workshop/kit/tools" "${ROOT}/tools"; do
+    if [ -f "${cand}/lock-tool.py" ]; then
+        TOOLS_DIR="$cand"
+        break
+    fi
+done
+
+if [ -z "$TOOLS_DIR" ]; then
+    echo "==> Could not locate the workshop tools directory." >&2
+    echo "    Looked for lock-tool.py under:" >&2
+    echo "      ${ROOT}/workshop/kit/tools   (cloned-repo layout)" >&2
+    echo "      ${ROOT}/tools                (extracted-kit / installed layout)" >&2
+    echo "    The clone or kit looks incomplete — re-clone or re-extract." >&2
+    exit 1
+fi
+
+LOCK_TOOL="${TOOLS_DIR}/lock-tool.py"
+RECOVER="${TOOLS_DIR}/recover-baseline.py"
+BUILD="${TOOLS_DIR}/build-injected.py"
+
+# ---------------------------------------------------------------------------
+# Point the bundled minipro at its BUNDLED device database, exactly as start.sh
+# does, so the --live path inherits the kit's minipro DB on a clean machine.
+# The env snippet lives next to the share/ DB it points at, which is layout-
+# dependent (same dual split as TOOLS_DIR):
+#   - cloned repo          -> <root>/workshop/kit/bin/minipro-env.sh
+#   - extracted/installed  -> <root>/bin/minipro-env.sh (sibling of this script)
+# Probe both; source the first that exists. Guard it so a missing snippet never
+# fails the launch (the no-hardware path does not need minipro at all). The
+# snippet only sets MINIPRO_HOME if the attendee has not, and no-ops if the
+# share dir is absent.
+# ---------------------------------------------------------------------------
+for snip in "${ROOT}/workshop/kit/bin/minipro-env.sh" "${ROOT}/bin/minipro-env.sh"; do
+    if [ -f "$snip" ]; then
+        # shellcheck source=/dev/null
+        . "$snip"
+        break
+    fi
+done
+
+# ---------------------------------------------------------------------------
+# python3 is the one hard requirement. If it is missing we cannot dispatch.
+# ---------------------------------------------------------------------------
+if ! command -v python3 >/dev/null 2>&1; then
+    echo "==> python3 was not found on your PATH." >&2
+    echo "    The lock tools need python3. Install it, then re-run ./bin/lock" >&2
+    echo "    Debian/Kali/Ubuntu:  sudo apt-get install -y python3" >&2
+    echo "    macOS (Homebrew):    brew install python3" >&2
+    exit 127
+fi
+
+usage() {
+    cat <<EOF
+lock — cwd-robust CLI for the Dead Bytes Tell No Lies workshop.
+
+Run from anywhere; the tools are resolved from this script's own location.
+
+Usage:
+    ./bin/lock read    [--dump PATH] [--all] [--live]
+    ./bin/lock write    --code DIGITS [--slot N] [--role ROLE] [--live] [--yes]
+    ./bin/lock recover  [--baseline PATH] [--yes] [--skip-verify]
+    ./bin/lock build    SRC.bin DST.bin
+
+Subcommands:
+    read     decode + print the 50-slot user-code table   -> lock-tool.py read
+    write    bake a code into a copy + re-decode (PREVIEW) -> lock-tool.py write
+    recover  flash the code-free baseline back             -> recover-baseline.py
+    build    additively inject the 3 canonical codes       -> build-injected.py
+
+The browser one-command is still  ./bin/start.sh  (no-hardware GUI).
+
+Tools dir in use: ${TOOLS_DIR}
+EOF
+}
+
+# ---------------------------------------------------------------------------
+# Dispatch. Pass remaining args through VERBATIM (including --live, --dump, etc.)
+# and preserve the underlying python's exit code.
+# ---------------------------------------------------------------------------
+if [ "$#" -eq 0 ]; then
+    usage
+    exit 2
+fi
+
+sub="$1"; shift
+case "$sub" in
+    read|write)
+        exec python3 "$LOCK_TOOL" "$sub" "$@"
+        ;;
+    recover)
+        exec python3 "$RECOVER" "$@"
+        ;;
+    build)
+        exec python3 "$BUILD" "$@"
+        ;;
+    -h|--help|help)
+        usage
+        exit 0
+        ;;
+    *)
+        echo "==> Unknown subcommand: ${sub}" >&2
+        echo >&2
+        usage >&2
+        exit 2
+        ;;
+esac

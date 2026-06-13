@@ -273,6 +273,34 @@ step_populate_workshop() {
         info "populated ${workshop_dir}/${sub}/"
     done
 
+    # bin/ — ship the cwd-robust launchers so attendees can run ./bin/lock and
+    # ./bin/start.sh from ~/workshop/ exactly as the handout shows. The launcher
+    # locates tools via a dual-path probe; in this installed tree tools/ is a
+    # SIBLING of bin/, which is the second probe candidate. We ship ONLY the two
+    # launchers + the minipro-env snippet + the share/minipro device DB so the
+    # launcher's --live path finds the bundled DB here too (MINIPRO_HOME). We do
+    # NOT ship the minipro BINARY into ~/workshop/bin (it lands on /usr/local/bin
+    # via install-minipro); the launcher uses whichever minipro is on PATH.
+    mkdir -p "${workshop_dir}/bin"
+    for launcher in start.sh lock minipro-env.sh; do
+        if [ -f "${KIT_DIR}/bin/${launcher}" ]; then
+            cp -a "${KIT_DIR}/bin/${launcher}" "${workshop_dir}/bin/${launcher}"
+        else
+            fail "populate-workshop" "kit launcher missing: ${KIT_DIR}/bin/${launcher}"
+        fi
+    done
+    chmod 755 "${workshop_dir}/bin/start.sh" "${workshop_dir}/bin/lock"
+    info "populated ${workshop_dir}/bin/ (start.sh, lock, minipro-env.sh)"
+
+    # share/minipro device DB — the launcher's minipro-env.sh resolves
+    # ../share/minipro relative to itself, so the installed tree needs this dir
+    # for the bundled-DB MINIPRO_HOME to point somewhere real on the --live path.
+    if [ -d "${KIT_DIR}/share/minipro" ]; then
+        mkdir -p "${workshop_dir}/share/minipro"
+        cp -a "${KIT_DIR}/share/minipro/." "${workshop_dir}/share/minipro/"
+        info "populated ${workshop_dir}/share/minipro/ (bundled device DB)"
+    fi
+
     # Also ship MANIFEST.md so the user can verify their tree later
     cp -a "${KIT_DIR}/MANIFEST.md" "${workshop_dir}/MANIFEST.md"
 
@@ -318,6 +346,24 @@ step_smoke_test() {
         fail "smoke-test" "recover-baseline.py --self-test FAIL. The installed baseline at ${baseline_in_workshop} did not validate against MD5 ${EXPECTED_BASELINE_MD5}."
     fi
     info "recover-baseline.py --self-test PASS (baseline ${baseline_in_workshop})"
+
+    # Launcher smoke — prove the cwd-robust ./bin/lock resolves tools from the
+    # installed sibling layout (~/workshop/{bin,tools}) and reads the codes. Run
+    # it from a NON-workshop cwd (/tmp) so this also asserts cwd-robustness, the
+    # exact property the launcher exists to provide. Assert on CONTENT (the demo
+    # codes), not just exit code.
+    local lock_launcher="${workshop_dir}/bin/lock"
+    if [ ! -x "$lock_launcher" ]; then
+        fail "smoke-test" "launcher ${lock_launcher} missing or not executable after populate."
+    fi
+    local lock_out
+    lock_out="$(cd /tmp && sudo -u "$SUDO_USER" "$lock_launcher" read --all 2>&1 || true)"
+    if ! echo "$lock_out" | grep -q '133769' \
+       || ! echo "$lock_out" | grep -q '420420' \
+       || ! echo "$lock_out" | grep -q '696969'; then
+        fail "smoke-test" "launcher ${lock_launcher} did not resolve tools / show the 3 demo codes from a non-workshop cwd. Output:\n${lock_out}"
+    fi
+    info "bin/lock read --all PASS (cwd-robust, resolves sibling tools/, shows 3 demo codes)"
 }
 
 # ---------------------------------------------------------------------------
@@ -343,10 +389,10 @@ main() {
     info ""
     info "Try the self-service tools (safe, no hardware needed):"
     info "  cd ~/${WORKSHOP_DIRNAME}"
-    info "  python3 tools/lock-tool.py read --all                 # READ the codes"
-    info "  python3 tools/lock-tool.py write --code 246810 --slot 25 --role supervisor"
-    info "  python3 tools/lock-menu.py                            # menu front-end"
-    info "  python3 tools/lock-panel.py                           # browser control panel"
+    info "  ./bin/lock read --all                                 # READ the codes (runs from anywhere)"
+    info "  ./bin/lock write --code 246810 --slot 25 --role supervisor"
+    info "  ./bin/start.sh                                        # browser control panel"
+    info "  python3 tools/lock-menu.py                            # menu front-end (no launcher)"
 }
 
 main "$@"

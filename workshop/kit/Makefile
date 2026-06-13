@@ -46,6 +46,16 @@ SRC_LOCK_TOOL             := $(WORKSHOP_SRC)/lock-tool.py
 SRC_LOCK_MENU             := $(WORKSHOP_SRC)/lock-menu.py
 SRC_LOCK_PANEL            := $(WORKSHOP_SRC)/lock-panel.py
 SRC_MINIPRO_BIN           := /usr/local/bin/minipro
+# Repo-root launchers. start.sh (browser one-command) and lock (cwd-robust CLI
+# dispatcher) live in the repo's top-level bin/ — i.e. two levels up from the
+# kit (workshop/kit -> workshop -> repo root). They ship INTO the kit's bin/ so
+# the extracted-tarball and installed-~/workshop layouts have the SAME launchers
+# the cloned repo has, making the one handout correct in every layout. The
+# launcher resolves tools via a dual-path probe (workshop/kit/tools in the repo,
+# ./tools in the kit/installed tree), so it works unchanged from kit/bin/.
+REPO_ROOT_DIR             := $(abspath $(WORKSHOP_DIR)/..)
+SRC_START_SH              := $(REPO_ROOT_DIR)/bin/start.sh
+SRC_LOCK_SH               := $(REPO_ROOT_DIR)/bin/lock
 # GPLv3 attribution/NOTICE that travels WITH the bundled minipro binary. The
 # binary is third-party Free Software (GPLv3); this file carries the upstream
 # project + URL, the pinned version/commit, the source-availability offer, and
@@ -123,6 +133,14 @@ assemble:
 	@# binary. Copied (not symlinked) so the tarball is self-contained.
 	@cp -f "$(SRC_MINIPRO_NOTICE)"        "$(KIT_DIR)/bin/MINIPRO-NOTICE.md"
 	@chmod 644 "$(KIT_DIR)/bin/MINIPRO-NOTICE.md"
+	@# Repo-root launchers — ship start.sh (browser one-command) + lock (cwd-
+	@# robust CLI dispatcher) INTO the kit's bin/ so the extracted-tarball and
+	@# installed layouts carry the same one-command entry points the cloned repo
+	@# has. Both are executable. The handout references ./bin/start.sh and
+	@# ./bin/lock; bundling them here makes those references valid in the kit too.
+	@cp -f "$(SRC_START_SH)"              "$(KIT_DIR)/bin/start.sh"
+	@cp -f "$(SRC_LOCK_SH)"               "$(KIT_DIR)/bin/lock"
+	@chmod 755 "$(KIT_DIR)/bin/start.sh" "$(KIT_DIR)/bin/lock"
 	@# udev rules — three files shipped by minipro 0.7.4 `make install`
 	@if [ -f "$(SRC_UDEV_RULES_DIR)/60-minipro.rules" ]; then \
 		cp -f "$(SRC_UDEV_RULES_DIR)/60-minipro.rules"          "$(KIT_DIR)/etc/udev/rules.d/60-minipro.rules"; \

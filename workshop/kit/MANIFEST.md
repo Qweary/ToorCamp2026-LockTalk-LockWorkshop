@@ -11,21 +11,23 @@ Every file shipped in `facilitator-kit-toorcamp-2026.tar.gz`. `selftest.sh` re-M
 
 | Path | Size (bytes) | MD5 | Role | Provenance |
 |---|---:|---|---|---|
-| `Makefile` | 12064 | `b9a06b93e61f395e9f78595b4085fb91` | build | reproducible build entry point |
+| `Makefile` | 13357 | `73f8946cfb8fc5728ddf561305423620` | build | reproducible build entry point |
 | `README.md` | 9456 | `e5089a15665f64c474ff799453bd955d` | doc | kit overview + facilitator stand-up instructions |
 | `bin/MINIPRO-NOTICE.md` | 3336 | `09c2ac6ccbecd1d4143db2dea197e7e6` | license | GPLv3 attribution + source-availability notice for the bundled minipro binary (DavidGriffith 0.7.4 / fd6b56af) |
+| `bin/lock` | 6138 | `4f8ff9a3baad1c794df991b1f83b6145` | launcher | cwd-robust CLI dispatcher over lock-tool.py / recover-baseline.py / build-injected.py; the attendee's ./bin/lock read\|write\|recover\|build — dual-path tools probe (workshop/kit/tools in-repo, ./tools in kit/installed) so the one handout is correct everywhere |
 | `bin/minipro` | 455856 | `6b4a79297372baa92ddf495090f74f7d` | binary | minipro 0.7.4 (DavidGriffith fd6b56af) — Linux-AMD64 ELF, GPLv3 (see bin/MINIPRO-NOTICE.md) |
 | `bin/minipro-env.sh` | 2325 | `b3725058676ceda8844a13e9f27d9951` | env | sourced snippet that sets MINIPRO_HOME to the kit's bundled share/minipro device DB (absolute, path-relative to this snippet); sourced by bin/start.sh and by the documented raw-minipro live command |
+| `bin/start.sh` | 10575 | `06201f578ac3b5545fd1a569d23b859d` | launcher | browser one-command entry point (cwd-robust; resolves its root from BASH_SOURCE); the attendee's ./bin/start.sh — same file the cloned repo ships, bundled so the extracted/installed layouts have it too |
 | `docs/DATAFLASH-DECODE-REFERENCE.md` | 20579 | `83dfd89650e7d02b73cf68dfd9e2fc6b` | doc | AT45DB041E dump format reference (page-0 layout, BCD-B encoding) |
 | `docs/FACILITATOR-GUIDE.md` | 47887 | `7dbc0451392ac3cc8be7880c2e587fc2` | doc | facilitator-facing workshop runbook (47KB) |
-| `docs/PARTICIPANT-HANDOUT.md` | 8251 | `013fcbfff4c043ff2b3873d347c49038` | doc | attendee-facing 1-page workshop handout |
+| `docs/PARTICIPANT-HANDOUT.md` | 9059 | `04f0ed5e52c7657d2b16e85c97e45d9d` | doc | attendee-facing 1-page workshop handout |
 | `dumps/intact-lock-AT45DB041E-main-2026-05-20.bin` | 540672 | `eb6acff32ef13b29ac6ebed10d77316d` | dump | canonical intact-lock baseline (540,672 bytes, sensitive, workshop-internal) |
 | `dumps/workshop-sample-3codes-AT45DB041E-2026-05-20.bin` | 540672 | `741dcc79d9975b956d9e1c0a14de0e2b` | dump | teaching sample (540,672 bytes, sensitive, workshop-internal): canonical baseline + the 3 default workshop codes injected additively at slots 19/32/49; default READ source for the tools |
 | `etc/udev/rules.d/60-minipro.rules` | 1118 | `0a709dddd9992911d0b3c4767cbcd1c5` | udev | minipro USB-device tagging rule (TL866A/CS, TL866II+, T48, T56, T76) |
 | `etc/udev/rules.d/61-minipro-plugdev.rules` | 676 | `18dc04e64b15bbfbf878f982bfffa233` | udev | grants MODE=660 + GROUP=plugdev on tagged minipro devices |
 | `etc/udev/rules.d/61-minipro-uaccess.rules` | 663 | `b5e0a5a289e94b61345b5278c2d9b67a` | udev | tags minipro devices with TAG+=uaccess (logind seat access) |
-| `install.sh` | 14870 | `e8ab48db68455b5431f0dc9714ca155f` | installer | one-command Kali stand-up entry point |
-| `selftest.sh` | 14227 | `67e5426dbcb7276832ac137ad2274723` | validator | hardware-free kit-integrity check |
+| `install.sh` | 17570 | `abc6f44933d1f741b82c94553c57a513` | installer | one-command Kali stand-up entry point |
+| `selftest.sh` | 15975 | `d62d70de42ceb65d9749f4b45c9cf37d` | validator | hardware-free kit-integrity check |
 | `share/minipro/infoic.xml` | 17861009 | `81e41770ff5ccde8da9344cc91894159` | device-db | minipro chip-profile database (programmable devices); version-pinned to bin/minipro commit fd6b56af — re-bundle from the SAME commit on any binary rebuild (drift rule); found at runtime via MINIPRO_HOME (bin/minipro-env.sh) |
 | `share/minipro/logicic.xml` | 187372 | `54e0c050e5f2e0e9b7d2179de5ec7be8` | device-db | minipro logic-IC profile database; version-pinned to bin/minipro commit fd6b56af — re-bundle from the SAME commit on any binary rebuild (drift rule); found at runtime via MINIPRO_HOME (bin/minipro-env.sh) |
 | `tools/build-injected.py` | 8683 | `7b93fe3986fbbf05ff5f7104c821b342` | tool | builds injected.bin from baseline + canonical 3-slot patch |

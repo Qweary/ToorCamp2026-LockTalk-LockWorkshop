@@ -32,15 +32,18 @@ $Panel    = Join-Path $ToolsDir 'lock-panel.py'
 # the Python CLI path set it where it is needed.
 
 function Write-Fallback {
+    # The lock launcher (lock.ps1) is cwd-robust and sits at the repo root beside
+    # this script, so the one-liners below work from any directory.
+    $LockCmd = Join-Path $RepoRoot 'lock.ps1'
     Write-Host ''
     Write-Host '----------------------------------------------------------------------'
-    Write-Host '  CLI fallback — run these from the cloned repo (no browser needed):'
+    Write-Host '  CLI fallback — run these from anywhere (no browser needed):'
     Write-Host '----------------------------------------------------------------------'
     Write-Host '  READ  the codes:'
-    Write-Host '    python workshop\kit\tools\lock-tool.py read --all'
+    Write-Host "    $LockCmd read --all"
     Write-Host ''
     Write-Host '  WRITE your own code:'
-    Write-Host '    python workshop\kit\tools\lock-tool.py write --code 246810 --slot 25 --role supervisor'
+    Write-Host "    $LockCmd write --code 246810 --slot 25 --role supervisor"
     Write-Host '----------------------------------------------------------------------'
     Write-Host ''
 }
