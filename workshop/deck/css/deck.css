@@ -549,8 +549,10 @@ body.no-scanline::after{display:none}
 .w7-split .w7-flow{max-width:none}
 /* slightly tighter command text so 5 rows fit a half-width column */
 .w7-split .flow-row{grid-template-columns:120px 1fr;padding:14px 22px;gap:14px}
-.w7-split .flow-row .fr-cmd{font-size:18px}
-.w7-split .flow-row .fr-note{font-size:15px}
+/* breathing room: drop the command off the step-label baseline, and
+   separate the note from the command line */
+.w7-split .flow-row .fr-cmd{font-size:18px;padding-top:6px}
+.w7-split .flow-row .fr-note{font-size:15px;margin-top:8px}
 
 /* browser-tool screenshot, framed, with an annotated caption */
 .w7-shot{
@@ -879,13 +881,13 @@ body.no-scanline::after{display:none}
 .w5-zones{
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:11px;
   max-width:1700px;
 }
 .w5-zones .zone{
   border:1px solid var(--gd);
   background:var(--bp);
-  padding:16px 24px;
+  padding:9px 24px;
 }
 .w5-zones .z-label{
   font-family:'Orbitron',sans-serif;
@@ -893,7 +895,7 @@ body.no-scanline::after{display:none}
   font-size:20px;
   letter-spacing:3px;
   color:var(--gm);
-  margin-bottom:10px;
+  margin-bottom:5px;
 }
 .w5-zones .z-label.red{color:var(--red);text-shadow:var(--gr-r)}
 .w5-zones .z-body{
@@ -901,7 +903,7 @@ body.no-scanline::after{display:none}
   font-size:23px;
   letter-spacing:.5px;
   color:var(--w);
-  line-height:1.55;
+  line-height:1.32;
   white-space:pre;
 }
 .w5-zones .z-arrow{color:var(--gm)}
@@ -909,7 +911,7 @@ body.no-scanline::after{display:none}
 .w5-zones .z-green{color:var(--g);text-shadow:0 0 6px rgba(0,230,118,.25)}
 .w5-zones .z-trap{border-color:var(--redm)}
 .w5-zones .z-trap .z-em{color:var(--red);text-shadow:var(--gr-r)}
-.w5-zones .z-pair{display:grid;grid-template-columns:1.7fr 1fr;gap:18px}
+.w5-zones .z-pair{display:grid;grid-template-columns:1.7fr 1fr;gap:11px}
 .w5-zones .z-pair .zone{margin:0}
 .w5-zones .z-worked{border-color:var(--g)}
 
