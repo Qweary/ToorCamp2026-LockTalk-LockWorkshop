@@ -24,10 +24,10 @@
 set -eu
 
 # ----- expected media ------------------------------------------------------
-EXPECTED_IMAGES=19
+EXPECTED_IMAGES=20
 EXPECTED_VIDEOS=1
 EXPECTED_POSTERS=1
-EXPECTED_TOTAL=21
+EXPECTED_TOTAL=22
 
 # ----- resolve paths from the SCRIPT's own location (run from anywhere) ----
 # This script lives in <repo>/talk/, so the repo root is its parent's parent.

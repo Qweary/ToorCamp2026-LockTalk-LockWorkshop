@@ -1200,6 +1200,18 @@ body.no-scanline::after{display:none}
 .exhibit.ex-red .exhibit-fallback{border-color:var(--redm);color:var(--redm)}
 .exhibit.ex-red .exhibit-fallback .efb-tag{color:var(--red)}
 
+/* ---------- S1b — the door: the deck's only PORTRAIT photo (hook beat) ----
+   00-lock-on-door.jpg is ~3000x4000 portrait (EXIF rotate). On the 1920x1080
+   canvas the .slide leaves 952px of usable height (1080 - 2*64 padding); the
+   figure is the lone flex child of a .center slide. Cap the img at 760px (the
+   deck's established portrait budget — see .exhibit-video video) so img +
+   ~80px figcaption (≈840) stays well inside 952 and clears the absolute anchor
+   (top) and brand (bottom). max-width keeps the tall-narrow frame from
+   stretching full-width; margin:0 auto centers it. object-fit:contain is
+   inherited, so the whole door stays visible, no crop. */
+.s1b-exhibit{max-width:640px;margin:0 auto}
+.s1b-exhibit img{max-height:760px}
+
 /* ---------- S6 — anatomy: board + macro pair beside components ---------- */
 .s6-anatomy{
   grid-template-columns:1.7fr 1fr;
