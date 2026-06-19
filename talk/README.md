@@ -1,4 +1,4 @@
-# Talk — Dead Bytes Tell No Lies
+# Talk — Physical Access, Digital Lies
 
 The ToorCamp 2026 conference talk on the Alarm Lock Trilogy T2/T3 access-control lock: a five-layer attack chain (physical, DataFlash, firmware, USB-cable, audit-trail) told from a locksmith's lens.
 
